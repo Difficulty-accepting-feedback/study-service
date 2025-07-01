@@ -1,0 +1,110 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	id 'jacoco'
+}
+
+group = 'com.grow'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+jacoco {
+	toolVersion = "0.8.13"
+}
+
+def jacocoExcludes = [
+		'**/exception/**',
+		'**/dto/**',
+		'**/thirdparty/**',
+		'**/entity/**',
+		'**/Q*.class',
+		'**/config/**',
+		'**/common/**',
+		'**/constants/**',
+		'**/listener/**',
+		'**/swagger/**'
+]
+
+jacocoTestCoverageVerification {
+	afterEvaluate {
+		classDirectories.setFrom(
+				files(classDirectories.files.collect { dir ->
+					fileTree(dir: dir, excludes: jacocoExcludes)
+				})
+		)
+	}
+	violationRules {
+		rule {
+			enabled = true
+			element = 'CLASS'
+			limit {
+//				counter = 'LINE' // 라인 커버리지 기준
+				value = 'COVEREDRATIO'
+//				minimum = 0.70 // 70% 이상이어야 통과
+			}
+		}
+	}
+}
+
+jacocoTestReport {
+	reports {
+		html.required.set(true)
+		html.destination file(project.layout.buildDirectory.dir("jacoco/index.html")) as File
+	}
+	afterEvaluate {
+		classDirectories.setFrom(
+				files(classDirectories.files.collect { dir ->
+					fileTree(dir: dir, excludes: jacocoExcludes)
+				})
+		)
+	}
+	finalizedBy(jacocoTestCoverageVerification)
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('snippetsDir', file("build/generated-snippets"))
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'com.h2database:h2'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	outputs.dir snippetsDir
+	useJUnitPlatform()
+}
+
+tasks.named('asciidoctor') {
+	inputs.dir snippetsDir
+	dependsOn test
+}
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs += ['-parameters']
+}
