@@ -27,10 +27,19 @@ public class Group {
 	}
 
 	public void rename(String newName) {
+		if (newName == null || newName.isBlank()) {
+			throw new IllegalArgumentException("그룹 이름은 비어 있을 수 없습니다.");
+		}
+		if (this.name.equals(newName)) {
+			throw new IllegalStateException("변경할 그룹 이름이 현재 이름과 동일합니다.");
+		}
 		this.name = newName;
 	}
 
 	public void updateDescription(String newDescription) {
+		if (newDescription == null || newDescription.isBlank()) {
+			throw new IllegalArgumentException("그룹 설명은 비어 있을 수 없습니다.");
+		}
 		this.description = newDescription;
 	}
 

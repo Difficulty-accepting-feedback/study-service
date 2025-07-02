@@ -33,7 +33,13 @@ public class Comment {
 	}
 
 	public void update(String content, LocalDateTime now) {
-		this.content = content;
+		if (this.deletedAt != null) {
+			throw new IllegalStateException("삭제된 댓글은 수정할 수 없습니다.");
+		}
+		if (content == null || content.isBlank()) {
+			throw new IllegalArgumentException("댓글 내용은 비어 있을 수 없습니다.");
+		}
+		this.content   = content;
 		this.updatedAt = now;
 	}
 
@@ -44,6 +50,9 @@ public class Comment {
 	}
 
 	public void delete(LocalDateTime now) {
+		if (this.deletedAt != null) {
+			throw new IllegalStateException("이미 삭제된 댓글입니다.");
+		}
 		this.deletedAt = now;
 	}
 

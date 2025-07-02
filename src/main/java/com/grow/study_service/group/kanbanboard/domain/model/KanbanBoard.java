@@ -30,6 +30,9 @@ public class KanbanBoard {
 	}
 
 	public void updateContent(String newContent) {
+		if (newContent == null || newContent.isBlank()) {
+			throw new IllegalArgumentException("할 일 내용은 비어 있을 수 없습니다.");
+		}
 		this.toDoContent = newContent;
 	}
 
@@ -44,6 +47,19 @@ public class KanbanBoard {
 	}
 
 	public void reschedule(LocalDateTime newStart, LocalDateTime newEnd) {
+		if (newStart == null || newEnd == null) {
+			throw new IllegalArgumentException("시작일과 종료일은 반드시 지정해야 합니다.");
+		}
+		if (newEnd.isBefore(newStart)) {
+			throw new IllegalArgumentException("종료일은 시작일 이후여야 합니다.");
+		}
+		if (newStart.isBefore(LocalDateTime.now())) {
+			throw new IllegalArgumentException("시작일은 현재 이후여야 합니다.");
+		}
+		if (this.isCompleted == KanbanStatus.DONE) {
+			throw new IllegalStateException("완료된 할 일은 일정을 변경할 수 없습니다.");
+		}
+
 		this.startDate = newStart;
 		this.endDate   = newEnd;
 	}

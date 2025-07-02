@@ -32,6 +32,12 @@ public class Post {
 	}
 
 	public void update(String title, String content, String fileUrl, LocalDateTime now) {
+		if (title == null || title.isBlank()) {
+			throw new IllegalArgumentException("제목은 비어 있을 수 없습니다.");
+		}
+		if (content == null || content.isBlank()) {
+			throw new IllegalArgumentException("내용은 비어 있을 수 없습니다.");
+		}
 		this.title = title;
 		this.content = content;
 		this.fileUrl = fileUrl;

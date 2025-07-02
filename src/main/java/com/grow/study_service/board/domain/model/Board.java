@@ -30,11 +30,20 @@ public class Board {
 	}
 
 	public void rename(String newName) {
+		if (newName == null || newName.isBlank()) {
+			throw new IllegalArgumentException("게시판 이름은 비어 있을 수 없습니다.");
+		}
+		if (this.name.equals(newName)) {
+			throw new IllegalStateException("변경할 게시판 이름이 현재 이름과 동일합니다.");
+		}
 		this.name = newName;
 	}
 
-	public void changeDescription(String newDesc) {
-		this.description = newDesc;
+	public void changeDescription(String newDescription) {
+		if (newDescription == null) {
+			throw new IllegalArgumentException("게시판 설명은 비어 있을 수 없습니다.");
+		}
+		this.description = newDescription;
 	}
 
 	public static Board of(Long boardId, Long groupId, String name, String description, LocalDateTime createdAt, List<Post> posts) {
