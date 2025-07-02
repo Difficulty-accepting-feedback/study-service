@@ -3,7 +3,7 @@ package com.grow.study_service.board.domain.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.grow.study_service.post.domain.model.Post;
+import com.grow.study_service.board.post.domain.model.Post;
 
 import lombok.Getter;
 
