@@ -7,11 +7,12 @@ import com.grow.study_service.group.domain.enums.Category;
 
 @Getter
 public class Group {
-	private Long groupId;
+	private final Long groupId;
+	private final Category category;
+	private final LocalDateTime createdAt;
 	private String name;
-	private Category category;
 	private String description;
-	private LocalDateTime createdAt;
+
 
 	private Group(Long groupId, String name, Category category, String description, LocalDateTime createdAt) {
 		this.groupId = groupId;
@@ -23,6 +24,14 @@ public class Group {
 
 	public static Group create(String name, Category category, String description, LocalDateTime now) {
 		return new Group(null, name, category, description, now);
+	}
+
+	public void rename(String newName) {
+		this.name = newName;
+	}
+
+	public void updateDescription(String newDescription) {
+		this.description = newDescription;
 	}
 
 	public static Group of(Long groupId, String name, Category category, String description, LocalDateTime createdAt) {

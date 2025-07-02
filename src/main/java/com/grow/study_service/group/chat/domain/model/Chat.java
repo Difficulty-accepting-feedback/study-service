@@ -8,12 +8,12 @@ import lombok.Getter;
 
 @Getter
 public class Chat {
-	private Long chatId;
-	private Long groupId;
-	private Long senderId;
-	private String content;
-	private MessageType messageType;
-	private LocalDateTime createdAt;
+	private final Long chatId;
+	private final Long groupId;
+	private final Long senderId;
+	private final String content;
+	private final MessageType messageType;
+	private final LocalDateTime createdAt;
 
 	private Chat(Long chatId, Long groupId, Long senderId, String content, MessageType messageType, LocalDateTime createdAt) {
 		this.chatId = chatId;

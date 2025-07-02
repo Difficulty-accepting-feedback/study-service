@@ -8,11 +8,11 @@ import lombok.Getter;
 
 @Getter
 public class GroupMember {
-	private Long groupMemberId;
-	private Long memberId;
-	private Long groupId;
-	private Role role;
-	private LocalDateTime joinedAt;
+	private final Long groupMemberId;
+	private final Long memberId;
+	private final Long groupId;
+	private final Role role;
+	private final LocalDateTime joinedAt;
 
 	private GroupMember(Long groupMemberId, Long memberId, Long groupId, Role role, LocalDateTime joinedAt) {
 		this.groupMemberId = groupMemberId;

@@ -8,8 +8,8 @@ import lombok.Getter;
 
 @Getter
 public class KanbanBoard {
-	private Long toDoId;
-	private Long GroupMemberId;
+	private final Long toDoId;
+	private final Long GroupMemberId;
 	private String toDoContent;
 	private KanbanStatus isCompleted;
 	private LocalDateTime startDate;
@@ -27,6 +27,25 @@ public class KanbanBoard {
 
 	public static KanbanBoard create(Long groupMemberId, String toDoContent, LocalDateTime startDate, LocalDateTime endDate) {
 		return new KanbanBoard(null, groupMemberId, toDoContent, KanbanStatus.READY, startDate, endDate);
+	}
+
+	public void updateContent(String newContent) {
+		this.toDoContent = newContent;
+	}
+
+	public void markInProgress(LocalDateTime now) {
+		this.isCompleted = KanbanStatus.IN_PROGRESS;
+		this.startDate   = now;
+	}
+
+	public void markDone(LocalDateTime now) {
+		this.isCompleted = KanbanStatus.DONE;
+		this.endDate     = now;
+	}
+
+	public void reschedule(LocalDateTime newStart, LocalDateTime newEnd) {
+		this.startDate = newStart;
+		this.endDate   = newEnd;
 	}
 
 	public static KanbanBoard of(Long toDoId, Long groupMemberId, String toDoContent, KanbanStatus isCompleted,

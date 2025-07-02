@@ -1,4 +1,4 @@
-package com.grow.study_service.comment.domain.model;
+package com.grow.study_service.board.comment.domain.model;
 
 import java.time.LocalDateTime;
 
@@ -7,9 +7,9 @@ import lombok.Getter;
 @Getter
 
 public class Comment {
-	private Long commentId;
-	private Long postId;
-	private Long memberId;
+	private final Long commentId;
+	private final Long postId;
+	private final Long memberId;
 	private Long parentId;
 	private String content;
 	private LocalDateTime createdAt;
@@ -41,6 +41,10 @@ public class Comment {
 		this.parentId = parentId;
 		this.createdAt = now;
 		this.updatedAt = now;
+	}
+
+	public void delete(LocalDateTime now) {
+		this.deletedAt = now;
 	}
 
 	public static Comment of(Long commentId, Long postId, Long memberId, Long parentId, String content,

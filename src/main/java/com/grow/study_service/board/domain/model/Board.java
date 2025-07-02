@@ -9,12 +9,12 @@ import lombok.Getter;
 
 @Getter
 public class Board {
-	private Long boardId;
-	private Long groupId;
+	private final Long boardId;
+	private final Long groupId;
+	private final List<Post> posts;
+	private final LocalDateTime createdAt;
 	private String name;
 	private String description;
-	private LocalDateTime createdAt;
-	private List<Post> posts;
 
 	private Board(Long boardId, Long groupId, String name, String description, LocalDateTime createdAt, List<Post> posts) {
 		this.boardId = boardId;
@@ -27,6 +27,14 @@ public class Board {
 
 	public static Board create(Long groupId, String name, String description, LocalDateTime now) {
 		return new Board(null, groupId, name, description, now, null);
+	}
+
+	public void rename(String newName) {
+		this.name = newName;
+	}
+
+	public void changeDescription(String newDesc) {
+		this.description = newDesc;
 	}
 
 	public static Board of(Long boardId, Long groupId, String name, String description, LocalDateTime createdAt, List<Post> posts) {

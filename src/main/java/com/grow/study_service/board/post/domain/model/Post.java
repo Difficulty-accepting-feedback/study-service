@@ -6,13 +6,13 @@ import lombok.Getter;
 
 @Getter
 public class Post {
-	private Long postId;
-	private Long boardId;
-	private Long memberId;
+	private final Long postId;
+	private final Long boardId;
+	private final Long memberId;
+	private final LocalDateTime createdAt;
 	private String title;
 	private String content;
 	private String fileUrl;
-	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 
 	private Post(Long postId, Long boardId, Long memberId, String title, String content, String fileUrl,
