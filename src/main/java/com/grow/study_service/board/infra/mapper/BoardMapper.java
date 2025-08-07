@@ -1,9 +1,9 @@
-package com.grow.study_service.board.infra.persistence.mapper;
+package com.grow.study_service.board.infra.mapper;
 
 import java.util.Collections;
 
 import com.grow.study_service.board.domain.model.Board;
-import com.grow.study_service.board.infra.persistence.entity.BoardJpaEntity;
+import com.grow.study_service.board.infra.entity.BoardJpaEntity;
 
 public class BoardMapper {
 	public static Board toDomain(BoardJpaEntity e) {

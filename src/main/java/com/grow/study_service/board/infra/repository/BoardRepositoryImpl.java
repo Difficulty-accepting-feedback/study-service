@@ -1,4 +1,4 @@
-package com.grow.study_service.board.infra.persistence.repository;
+package com.grow.study_service.board.infra.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.grow.study_service.board.domain.model.Board;
 import com.grow.study_service.board.domain.repository.BoardRepository;
-import com.grow.study_service.board.infra.persistence.mapper.BoardMapper;
+import com.grow.study_service.board.infra.mapper.BoardMapper;
 
 import lombok.RequiredArgsConstructor;
 
