@@ -129,6 +129,13 @@ public class Board {
         }
     }
 
+    /**
+     * 게시판 설명을 업데이트하는 메서드.
+     * 새로운 설명이 기존 설명과 다를 경우에만 업데이트하며, null 값은 허용되지 않습니다.
+     *
+     * @param newDescription 새로운 게시판 설명.
+     * @throws DomainException 새 설명이 null일 경우 예외 발생.
+     */
     public void updateDescription(String newDescription) {
         if (newDescription == null) {
             throw new DomainException(ErrorCode.BOARD_DESCRIPTION_IS_EMPTY);
