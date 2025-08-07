@@ -25,16 +25,13 @@ public class GroupJpaEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
 	private String name;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
 	private Category category;
 
-	@Column(nullable = false, columnDefinition = "TEXT")
+	@Column(columnDefinition = "TEXT")
 	private String description;
 
-	@Column(nullable = false)
 	private LocalDateTime createdAt;
 }

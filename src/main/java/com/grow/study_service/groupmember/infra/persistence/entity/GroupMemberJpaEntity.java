@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import com.grow.study_service.groupmember.domain.enums.Role;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -24,20 +23,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class GroupMemberJpaEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
 	private Long memberId;
 
-	@Column(nullable = false)
 	private Long groupId;
 
-	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Role role;
 
-	@Column(nullable = false)
 	private LocalDateTime joinedAt;
 }
