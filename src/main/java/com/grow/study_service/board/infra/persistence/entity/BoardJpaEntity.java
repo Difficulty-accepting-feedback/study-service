@@ -16,8 +16,6 @@ import lombok.*;
 @Table(name = "board")
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-
-
 public class BoardJpaEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
