@@ -15,6 +15,12 @@ public enum BoardType {
     // 공지사항 게시판
     NOTICE("공지사항 게시판"),
 
+    // 비디오/음성 채팅 게시판
+    VIDEO_VOICE_CHAT("비디오/음성 채팅 게시판"),
+
+    // 문서 협업 게시판
+    COLLABORATIVE_DOCUMENT("문서 협업 게시판"),
+
     // 커스텀 게시판
     CUSTOM("커스텀 게시판");
 

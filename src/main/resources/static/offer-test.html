@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<h1>STOMP OFFER 전송 테스트 클라이언트</h1>
+<button onclick="sendOffer()"> Offer </button>
+<script>
+    const socket = new WebSocket('ws://localhost:8080/signaling');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, () => {
+        console.log('STOMP 연결 성공');
+
+        // /topic/peer/offer/{roomId}/{targetMemberId} 구독 (브로드캐스트 받기 테스트)
+        stompClient.subscribe('/topic/peer/offer/1/1', (message) => {
+            console.log('수신된 Offer: ' + message.body);
+        });
+    });
+
+    function sendOffer() {
+        const offerData = JSON.stringify({ offer: 'test offer data' });  // @Payload로 받을 데이터
+        stompClient.send('/app/offer/1/1', {}, offerData);  // /app prefix + 매핑 경로
+        console.log('Offer 전송 완료');
+    }
+</script>
+</body>
+</html>
