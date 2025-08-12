@@ -17,12 +17,13 @@ public class Notice {
 
     // 생성할 때
     public static Notice create(Long groupId,
-                                String content) {
+                                String content,
+                                boolean isPinned) {
         return new Notice(
                 null, // 공지사항 아이디는 자동 생성
                 groupId,
                 content,
-                false // 메인 등록 여부는 기본 false로 설정
+                isPinned
         );
     }
 
