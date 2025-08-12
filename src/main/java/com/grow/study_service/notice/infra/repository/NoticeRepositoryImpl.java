@@ -7,6 +7,8 @@ import com.grow.study_service.notice.infra.mapper.NoticeMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * NoticeRepositoryImpl 클래스
  * <p>
@@ -38,5 +40,12 @@ public class NoticeRepositoryImpl implements NoticeRepository {
     public void save(Notice notice) {
         NoticeJpaEntity entity = mapper.toEntity(notice);
         noticeJpaRepository.save(entity);
+    }
+
+    @Override
+    public void saveAll(List<Notice> notices) {
+        for (Notice notice : notices) {
+            save(notice);
+        }
     }
 }
