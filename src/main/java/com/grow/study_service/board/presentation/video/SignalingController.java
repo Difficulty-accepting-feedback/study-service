@@ -1,11 +1,16 @@
 package com.grow.study_service.board.presentation.video;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <h2>WebRTC 시그널링 컨트롤러 클래스.</h2>
@@ -19,52 +24,55 @@ import org.springframework.stereotype.Controller;
  */
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 public class SignalingController {
 
+    private final SimpMessagingTemplate messagingTemplate;
+    private final SocketConnectionHandler handler;
+
     /**
-     * Offer를 처리하는 메서드.
-     * 클라이언트 A가 보낸 offer를 받아 대상 클라이언트 B의 토픽으로 브로드캐스트합니다.
-     * 클라이언트는 /app/offer/{roomId}/{targetMemberId} 경로로 요청을 보냅니다.
+     * Offer/Answer 을 처리하는 메서드.
+     * 클라이언트 A가 보낸 offer 혹은 answer 을 받아 대상 클라이언트 B에게 브로드캐스트합니다.
+     * 클라이언트는 /app/room/{roomId}경로로 요청을 보냅니다.
      *
-     * @param offer 클라이언트가 보낸 offer 데이터 (SDP 문자열).
+     * @param data 클라이언트가 보낸 offer / answer 데이터 (SDP 문자열).
      * @param roomId 채팅방의 고유 식별자 (roomId).
-     * @param targetMemberId 대상 회원의 고유 식별자 (targetMemberId).
-     * @return 받은 offer 데이터를 그대로 반환하여 브로드캐스트.
+     * @return 받은 데이터를 그대로 반환하여 브로드캐스트.
      */
     /**
      * 전송되는 문자열 예시
      * {
-     *   "type": "offer",
-     *   "sdp": "v=0\r\no=- 6137031273746274589 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE (이하 생략)"
+     * "type":"offer",
+     * "offer":{"sdp":"v=0\r\no=- 36648...,"type":"offer"}
      * }
      */
-    @MessageMapping("/offer/{roomId}/{targetMemberId}")
-    @SendTo("/topic/peer/offer/{roomId}/{targetMemberId}")
-    public String handleOffer(@Payload String offer,
-                              @DestinationVariable String roomId,
-                              @DestinationVariable String targetMemberId) {
-        log.info("[Offer Received] 요청 수신 완료 | roomId={}, targetMemberId={}, offer=[{}]",
-                roomId, targetMemberId, offer);
-        return offer;
-    }
+    @MessageMapping("/room/{roomId}")
+    public void handleSignaling(@Payload Map<String, Object> message,
+                                @DestinationVariable String roomId) {
+        String type = (String) message.get("type");
+        String senderId = (String) message.get("senderId");
 
-    /**
-     * Answer를 처리하는 메서드.
-     * 클라이언트 B가 보낸 answer를 받아 대상 클라이언트 A의 토픽으로 브로드캐스트합니다.
-     * 클라이언트는 /app/peer/answer/{roomId}/{targetMemberId} 경로로 요청을 보냅니다.
-     *
-     * @param answer 클라이언트가 보낸 answer 데이터 (SDP 문자열).
-     * @param roomId 채팅방의 고유 식별자 (roomId).
-     * @param targetMemberId 대상 회원의 고유 식별자 (targetMemberId).
-     * @return 받은 answer 데이터를 그대로 반환하여 브로드캐스트.
-     */
-    @MessageMapping("/peer/answer/{roomId}/{targetMemberId}")
-    @SendTo("/topic/peer/answer/{roomId}/{targetMemberId}")
-    public String handleAnswer(@Payload String answer,
-                               @DestinationVariable String roomId,
-                               @DestinationVariable String targetMemberId) {
-        log.info("[Answer Received] 요청 수신 완료 | roomId={}, targetMemberId={}, answer=[{}]",
-                roomId, targetMemberId, answer);
-        return answer;
+        if (senderId == null) {
+            log.warn("senderId가 없음 - 브로드캐스트 스킵");
+            return;
+        }
+
+        // 방의 사용자 목록 가져오기
+        Set<String> usersInRoom = handler
+                .getRoomUsers()
+                .getOrDefault(roomId, new HashSet<>());
+
+        if (handler.getRoomUsers().isEmpty()) {
+            log.warn("usersInRoom이 비어있음 - 브로드캐스트 스킵");
+            // TODO 방이 비어있을 때 처리하기 (SimpUserRegistry 등을 활용)
+        }
+
+        // sender을 제외한 나머지 사용자들에게 offer 을 전송
+        for (String targetId : usersInRoom) {
+            if (!targetId.equals(senderId)) {
+                messagingTemplate.convertAndSendToUser(targetId, "/queue/room/" + targetId, message);
+                log.info("data 전송: type={}, from={}, to={}", type, senderId, targetId);
+            }
+        }
     }
 }
