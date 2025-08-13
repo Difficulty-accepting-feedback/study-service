@@ -53,4 +53,20 @@ public class GroupMemberRepositoryImpl implements GroupMemberRepository {
 		return groupMemberJpaRepository.findByMemberIdAndGroupId(memberId, groupId)
 				.map(GroupMemberMapper::toDomain);
 	}
+
+	/**
+	 * 지정된 그룹에 특정 회원이 속해 있는지 여부를 확인한다.
+	 * <p>
+	 * DB에서 해당 그룹 ID와 회원 ID로 검색하여 존재 여부를 반환한다.
+	 * </p>
+	 *
+	 * @param groupId  그룹 ID
+	 * @param memberId 회원 ID
+	 * @return {@code true} - 해당 회원이 그룹에 속한 경우,
+	 *         {@code false} - 속하지 않은 경우
+	 */
+	@Override
+	public boolean existsByGroupIdAndMemberId(Long groupId, Long memberId) {
+		return groupMemberJpaRepository.existsByGroupIdAndMemberId(groupId, memberId);
+	}
 }

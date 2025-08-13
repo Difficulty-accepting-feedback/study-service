@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class NoticeUpdateRequest {
 
+    /** 공지 ID (필수) */
     @NotNull(message = "공지 ID는 필수입니다.")
     private Long noticeId;
 

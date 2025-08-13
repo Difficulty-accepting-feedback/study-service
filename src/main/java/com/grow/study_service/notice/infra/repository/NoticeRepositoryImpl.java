@@ -4,6 +4,7 @@ import com.grow.study_service.notice.domain.model.Notice;
 import com.grow.study_service.notice.domain.repository.NoticeRepository;
 import com.grow.study_service.notice.infra.entity.NoticeJpaEntity;
 import com.grow.study_service.notice.infra.mapper.NoticeMapper;
+import com.grow.study_service.notice.presentation.dto.NoticeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -54,5 +55,13 @@ public class NoticeRepositoryImpl implements NoticeRepository {
     public Optional<Notice> findByNoticeId(Long noticeId) {
         return noticeJpaRepository.findById(noticeId)
                 .map(mapper::toDomain);
+    }
+
+    @Override
+    public List<Notice> findByGroupId(Long groupId) {
+        List<Notice> list = noticeJpaRepository.findByGroupId(groupId).stream()
+                .map(mapper::toDomain)
+                .toList();
+        return list;
     }
 }

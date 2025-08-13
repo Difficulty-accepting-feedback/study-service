@@ -3,6 +3,7 @@ package com.grow.study_service.notice.presentation.controller;
 import com.grow.study_service.common.exception.domain.DomainException;
 import com.grow.study_service.common.rsdata.RsData;
 import com.grow.study_service.notice.application.service.NoticeService;
+import com.grow.study_service.notice.presentation.dto.NoticeResponse;
 import com.grow.study_service.notice.presentation.dto.NoticeSaveRequest;
 import com.grow.study_service.notice.presentation.dto.NoticeUpdateRequest;
 import jakarta.validation.Valid;
@@ -76,7 +77,27 @@ public class NoticeController {
         );
     }
 
-    // 공지사항 조회 API
+    /**
+     * 특정 그룹의 모든 공지사항을 조회하는 API.
+     * <p>회원이 해당 그룹에 속해 있는지 검증 후, 공지사항 목록을 반환한다.</p>
+     *
+     * @param groupId  PathVariable - 조회할 그룹 ID
+     * @param memberId RequestHeader("X-Authorization-Id") - 요청 회원 ID
+     * @return 공지사항 목록과 처리 결과를 담은 {@link RsData}
+     *
+     * @throws DomainException 요청자가 그룹에 속하지 않았거나 접근 권한이 없는 경우
+     */
+    @GetMapping("/{groupId}")
+    public RsData<List<NoticeResponse>> getNotices(@PathVariable("groupId") Long groupId,
+                                                   @RequestHeader("X-Authorization-Id") Long memberId) {
+
+        List<NoticeResponse> notices = noticeService.getNotices(groupId, memberId);
+
+        return new RsData<>("200",
+                "공지사항 조회 완료",
+                notices
+        );
+    }
 
     // 공지사항 삭제 API
 }
