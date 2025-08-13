@@ -1,5 +1,6 @@
 package com.grow.study_service.notice.presentation.controller;
 
+import com.grow.study_service.common.exception.domain.DomainException;
 import com.grow.study_service.common.rsdata.RsData;
 import com.grow.study_service.notice.application.service.NoticeService;
 import com.grow.study_service.notice.presentation.dto.NoticeSaveRequest;
@@ -32,6 +33,16 @@ public class NoticeController {
      */
     private final NoticeService noticeService;
 
+    /**
+     * 신규 공지사항 저장 API.
+     * <p>요청자의 회원 ID와 저장할 공지사항 정보를 받아 신규 공지를 등록한다.</p>
+     *
+     * @param memberId RequestHeader("X-Authorization-Id") - 요청 회원 ID
+     * @param request  RequestBody(JSON) - 저장할 공지사항 데이터
+     *
+     * @return 처리 결과 메시지
+     * @throws DomainException 권한이 없거나 요청 데이터가 유효하지 않은 경우
+     */
     @PostMapping("/save")
     public RsData<String> saveNotice(@RequestHeader("X-Authorization-Id") Long memberId,
                                      @Valid @RequestBody NoticeSaveRequest request) {
@@ -42,8 +53,19 @@ public class NoticeController {
         );
     }
 
-    // 공지사항 업데이트 API (내용 변경 등)
-    @PutMapping("/update/{groupId}") // 전체 수정 가능하도록 함
+    /**
+     * 지정된 그룹의 공지사항을 전체 업데이트한다.
+     * <p>내용 수정, 메인 고정 여부 변경 등을 포함하여 여러 건을 한 번에 처리</p>
+     *
+     * @param groupId   PathVariable - 그룹 ID
+     * @param memberId  RequestHeader("X-Authorization-Id") - 요청한 회원 ID
+     * @param request   RequestBody(JSON) - 수정할 공지사항 목록
+     *
+     * @return 처리 결과 메시지
+     *
+     * @throws DomainException 권한이 없거나 요청 데이터가 유효하지 않을 경우
+     */
+    @PutMapping("/update/{groupId}")
     public RsData<String> updateNotice(@PathVariable("groupId") Long groupId,
                                        @RequestHeader("X-Authorization-Id") Long memberId,
                                        @Valid @RequestBody List<NoticeUpdateRequest> request) {
