@@ -32,14 +32,6 @@ public class GroupMemberRepositoryImpl implements GroupMemberRepository {
 	}
 
 	@Override
-	public List<GroupMember> findByGroupId(Long groupId) {
-		return groupMemberJpaRepository.findByGroupId(groupId)
-			.stream()
-			.map(GroupMemberMapper::toDomain)
-			.collect(Collectors.toList());
-	}
-
-	@Override
 	public void delete(GroupMember member) {
 		groupMemberJpaRepository.delete(GroupMemberMapper.toEntity(member));
 	}
