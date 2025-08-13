@@ -1,6 +1,5 @@
 package com.grow.study_service.groupmember.domain.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.grow.study_service.groupmember.domain.model.GroupMember;
@@ -10,4 +9,5 @@ public interface GroupMemberRepository {
 	Optional<GroupMember> findById(Long groupMemberId);
 	void delete(GroupMember member);
 	Optional<GroupMember> findGroupMemberByMemberIdAndGroupId(Long memberId, Long groupId);
+	boolean existsByGroupIdAndMemberId(Long groupId, Long memberId);
 }
