@@ -2,8 +2,8 @@ package com.grow.study_service.groupmember.domain.model;
 
 import java.time.LocalDateTime;
 
-import com.grow.study_service.group.domain.exception.DomainException;
-import com.grow.study_service.group.domain.exception.ErrorCode;
+import com.grow.study_service.common.exception.domain.DomainException;
+import com.grow.study_service.common.exception.ErrorCode;
 import com.grow.study_service.groupmember.domain.enums.Role;
 
 import lombok.AllArgsConstructor;
@@ -162,6 +162,26 @@ public class GroupMember {
 
 		if (!this.role.equals(newRole)) {
 			this.role = newRole;
+		}
+	}
+
+	/**
+	 * 그룹 리더인지 여부를 검증하는 메서드.
+	 * <p>
+	 * 전달받은 {@link Role}이 {@code LEADER}가 아닐 경우
+	 * {@link DomainException}을 발생시켜 호출 흐름을 중단한다.
+	 * </p>
+	 *
+	 * <p>이 메서드는 주로 그룹장 권한이 필요한 서비스 로직에서
+	 * 사전 권한 체크용으로 사용된다.</p>
+	 *
+	 * @param role 검증할 사용자의 역할
+	 * @throws DomainException 사용자의 역할이 {@code LEADER}가 아닐 경우
+	 *                         {@link ErrorCode#GROUP_LEADER_REQUIRED} 코드와 함께 예외가 발생한다.
+	 */
+	public void verifyGroupLeader(Role role) {
+		if (role != Role.LEADER) {
+			throw new DomainException(ErrorCode.GROUP_LEADER_REQUIRED);
 		}
 	}
 }

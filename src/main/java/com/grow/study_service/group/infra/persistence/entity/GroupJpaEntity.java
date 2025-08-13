@@ -17,7 +17,7 @@ import lombok.*;
 @Entity
 @Getter
 @Builder
-@Table(name = "group")
+@Table(name = "groups")
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class GroupJpaEntity {

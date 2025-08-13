@@ -1,5 +1,6 @@
-package com.grow.study_service.group.domain.exception;
+package com.grow.study_service.common.exception.domain;
 
+import com.grow.study_service.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

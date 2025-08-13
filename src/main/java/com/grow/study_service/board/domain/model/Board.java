@@ -3,8 +3,8 @@ package com.grow.study_service.board.domain.model;
 import java.time.LocalDateTime;
 
 import com.grow.study_service.board.domain.enums.BoardType;
-import com.grow.study_service.group.domain.exception.DomainException;
-import com.grow.study_service.group.domain.exception.ErrorCode;
+import com.grow.study_service.common.exception.domain.DomainException;
+import com.grow.study_service.common.exception.ErrorCode;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

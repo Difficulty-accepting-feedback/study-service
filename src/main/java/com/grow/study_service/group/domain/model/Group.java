@@ -1,7 +1,7 @@
 package com.grow.study_service.group.domain.model;
 
-import com.grow.study_service.group.domain.exception.DomainException;
-import com.grow.study_service.group.domain.exception.ErrorCode;
+import com.grow.study_service.common.exception.domain.DomainException;
+import com.grow.study_service.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
