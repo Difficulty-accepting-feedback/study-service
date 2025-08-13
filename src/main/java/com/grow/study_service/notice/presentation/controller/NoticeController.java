@@ -3,6 +3,7 @@ package com.grow.study_service.notice.presentation.controller;
 import com.grow.study_service.common.rsdata.RsData;
 import com.grow.study_service.notice.application.service.NoticeService;
 import com.grow.study_service.notice.presentation.dto.NoticeSaveRequest;
+import com.grow.study_service.notice.presentation.dto.NoticeUpdateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,31 +42,19 @@ public class NoticeController {
         );
     }
 
-    /**
-     * 신규 공지사항을 저장하는 API
-     *
-     * <p>요청 바디로 전달받은 {@link NoticeSaveRequest} 리스트를 서비스에 전달하여 저장한다.</p>
-     *
-     * @param request 저장할 공지사항 정보 목록
-     *                (JSON 배열 형식, 각 원소는 {@link NoticeSaveRequest} 규격이어야 함)
-     * @return 저장 처리 결과를 담은 {@link RsData} 객체
-     * @see NoticeSaveRequest
-     * @see NoticeService#saveNotices(List)
-     */
-    @PostMapping("/save/bulk")
-    public RsData<String> saveNotices(@Valid @RequestBody List<NoticeSaveRequest> request) {
-        log.info("[Notice Save] 공지 사항 저장 시작");
-
-        noticeService.saveNotices(request);
-
-        log.info("[Notice Save] 공지 사항 저장 완료");
-
-        return new RsData<>(
-                "201",
-                "공지사항 저장 완료",
+    // 공지사항 업데이트 API (내용 변경 등)
+    @PutMapping("/update/{groupId}") // 전체 수정 가능하도록 함
+    public RsData<String> updateNotice(@PathVariable("groupId") Long groupId,
+                                       @RequestHeader("X-Authorization-Id") Long memberId,
+                                       @Valid @RequestBody List<NoticeUpdateRequest> request) {
+        noticeService.updateNotices(groupId, memberId, request);
+        return new RsData<>("200",
+                "공지사항 업데이트 완료",
                 null
         );
     }
 
-    // 공지사항 업데이트 API (내용 변경, 삭제 등)
+    // 공지사항 조회 API
+
+    // 공지사항 삭제 API
 }
