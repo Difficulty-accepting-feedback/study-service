@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * NoticeRepositoryImpl 클래스
@@ -47,5 +48,11 @@ public class NoticeRepositoryImpl implements NoticeRepository {
         for (Notice notice : notices) {
             save(notice);
         }
+    }
+
+    @Override
+    public Optional<Notice> findByNoticeId(Long noticeId) {
+        return noticeJpaRepository.findById(noticeId)
+                .map(mapper::toDomain);
     }
 }
