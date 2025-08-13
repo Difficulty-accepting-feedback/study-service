@@ -6,10 +6,7 @@ import com.grow.study_service.notice.presentation.dto.NoticeSaveRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,8 +26,20 @@ import java.util.List;
 @RequestMapping("/api/notice")
 public class NoticeController {
 
-    /** 공지사항 관련 기능을 처리하는 서비스 레이어 */
+    /**
+     * 공지사항 관련 기능을 처리하는 서비스 레이어
+     */
     private final NoticeService noticeService;
+
+    @PostMapping("/save")
+    public RsData<String> saveNotice(@RequestHeader("X-Authorization-Id") Long memberId,
+                                     @Valid @RequestBody NoticeSaveRequest request) {
+        noticeService.saveNotice(memberId, request);
+        return new RsData<>("201",
+                "공지사항 저장 완료",
+                null
+        );
+    }
 
     /**
      * 신규 공지사항을 저장하는 API
@@ -40,15 +49,14 @@ public class NoticeController {
      * @param request 저장할 공지사항 정보 목록
      *                (JSON 배열 형식, 각 원소는 {@link NoticeSaveRequest} 규격이어야 함)
      * @return 저장 처리 결과를 담은 {@link RsData} 객체
-     *
      * @see NoticeSaveRequest
-     * @see NoticeService#saveNotice(List)
+     * @see NoticeService#saveNotices(List)
      */
-    @PostMapping("/save")
-    public RsData<String> saveNotice(@Valid @RequestBody List<NoticeSaveRequest> request) {
+    @PostMapping("/save/bulk")
+    public RsData<String> saveNotices(@Valid @RequestBody List<NoticeSaveRequest> request) {
         log.info("[Notice Save] 공지 사항 저장 시작");
 
-        noticeService.saveNotice(request);
+        noticeService.saveNotices(request);
 
         log.info("[Notice Save] 공지 사항 저장 완료");
 
@@ -59,7 +67,5 @@ public class NoticeController {
         );
     }
 
-    // 공지사항 중 컨텐츠, pin 여부를 변경하는 API
-
-    // 공지사항 삭제 API
+    // 공지사항 업데이트 API (내용 변경, 삭제 등)
 }

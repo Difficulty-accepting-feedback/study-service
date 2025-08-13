@@ -8,6 +8,6 @@ import com.grow.study_service.groupmember.domain.model.GroupMember;
 public interface GroupMemberRepository {
 	GroupMember save(GroupMember member);
 	Optional<GroupMember> findById(Long groupMemberId);
-	List<GroupMember> findByGroupId(Long groupId);
 	void delete(GroupMember member);
+	Optional<GroupMember> findGroupMemberByMemberIdAndGroupId(Long memberId, Long groupId);
 }

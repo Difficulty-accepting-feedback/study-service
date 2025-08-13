@@ -1,5 +1,9 @@
 package com.grow.study_service.notice.application.service;
 
+import com.grow.study_service.common.exception.ErrorCode;
+import com.grow.study_service.common.exception.service.ServiceException;
+import com.grow.study_service.groupmember.domain.model.GroupMember;
+import com.grow.study_service.groupmember.domain.repository.GroupMemberRepository;
 import com.grow.study_service.notice.domain.model.Notice;
 import com.grow.study_service.notice.domain.repository.NoticeRepository;
 import com.grow.study_service.notice.presentation.dto.NoticeSaveRequest;
@@ -26,8 +30,33 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NoticeServiceImpl implements NoticeService {
 
-    /** 공지사항 데이터 저장소 */
+    /**
+     * 공지사항 데이터 저장소
+     */
     private final NoticeRepository noticeRepository;
+    private final GroupMemberRepository groupMemberRepository;
+
+    @Override
+    @Transactional
+    public void saveNotice(Long memberId, NoticeSaveRequest request) {
+        log.info("[Notice Save] 공지사항 저장 시작 (1/2)");
+
+        // 권한 검증을 위해 멤버 ID와 그룹 ID를 조합하여 조회
+        GroupMember groupMember = groupMemberRepository
+                .findGroupMemberByMemberIdAndGroupId(memberId, request.getGroupId())
+                .orElseThrow(() -> new ServiceException(ErrorCode.GROUP_MEMBER_NOT_FOUND));
+
+        // 권한 검증 로직 수행
+        groupMember.verifyGroupLeader(groupMember.getRole());
+
+        noticeRepository.save(
+                Notice.create(
+                        request.getGroupId(),
+                        request.getContent(),
+                        request.getIsPinned()
+                ));
+        log.info("[Notice Save] 공지사항 저장 완료 (2/2)");
+    }
 
     /**
      * 신규 공지사항 목록 저장
@@ -42,7 +71,7 @@ public class NoticeServiceImpl implements NoticeService {
      */
     @Override
     @Transactional
-    public void saveNotice(List<NoticeSaveRequest> request) {
+    public void saveNotices(List<NoticeSaveRequest> request) {
         // 임시 저장용 공지사항 목록
         List<Notice> notices = new ArrayList<>();
 
