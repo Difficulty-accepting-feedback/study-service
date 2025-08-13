@@ -1,11 +1,13 @@
 package com.grow.study_service.notice.application.service;
 
 import com.grow.study_service.common.exception.ErrorCode;
+import com.grow.study_service.common.exception.domain.DomainException;
 import com.grow.study_service.common.exception.service.ServiceException;
 import com.grow.study_service.groupmember.domain.model.GroupMember;
 import com.grow.study_service.groupmember.domain.repository.GroupMemberRepository;
 import com.grow.study_service.notice.domain.model.Notice;
 import com.grow.study_service.notice.domain.repository.NoticeRepository;
+import com.grow.study_service.notice.presentation.dto.NoticeResponse;
 import com.grow.study_service.notice.presentation.dto.NoticeSaveRequest;
 import com.grow.study_service.notice.presentation.dto.NoticeUpdateRequest;
 import lombok.RequiredArgsConstructor;
@@ -80,6 +82,25 @@ public class NoticeServiceImpl implements NoticeService {
         noticeRepository.saveAll(notices);
 
         log.info("[Notice Save] 공지사항 업데이트 완료 (2/2)");
+    }
+
+    @Override
+    public List<NoticeResponse> getNotices(Long groupId, Long memberId) {
+        // 멤버가 해당 그룹의 멤버인지 권한 검사
+        log.info("[Notice Find] 공지사항 조회 시작 (1/2)");
+        boolean isMember = groupMemberRepository.existsByGroupIdAndMemberId(groupId, memberId);
+
+        if (!isMember) {
+            throw new ServiceException(ErrorCode.MEMBER_NOT_IN_GROUP);
+        }
+
+        // 공지사항 조회
+        List<Notice> noticeList = noticeRepository.findByGroupId(groupId);
+        log.info("[Notice Find] 공지사항 조회 완료 (2/2)");
+
+        return noticeList.stream()
+                .map(n -> new NoticeResponse(n.getNoticeId(), n.getContent(), n.isPinned()))
+                .toList();
     }
 
     private void verifyAuthentification(Long memberId, Long groupId) {
