@@ -99,5 +99,14 @@ public class NoticeController {
         );
     }
 
-    // 공지사항 삭제 API
+    @DeleteMapping("/{groupId}/{noticeId}")
+    public RsData<String> deleteNotice(@PathVariable("groupId") Long groupId,
+                                       @PathVariable("noticeId") Long noticeId,
+                                       @RequestHeader("X-Authorization-Id") Long memberId) {
+        noticeService.deleteNotice(groupId, noticeId, memberId);
+        return new RsData<>("200",
+                "공지사항 삭제 완료",
+                null
+        );
+    }
 }

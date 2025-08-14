@@ -64,4 +64,9 @@ public class NoticeRepositoryImpl implements NoticeRepository {
                 .toList();
         return list;
     }
+
+    @Override
+    public void deleteById(Long noticeId) {
+        noticeJpaRepository.deleteById(noticeId);
+    }
 }

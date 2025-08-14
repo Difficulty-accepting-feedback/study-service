@@ -142,6 +142,54 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     /**
+     * 지정된 그룹 내의 공지사항을 삭제합니다.
+     * <p>
+     * 처리 절차:
+     * <ol>
+     *     <li>공지사항 ID로 엔티티를 조회
+     *         (존재하지 않으면 {@link ServiceException} 발생, {@link ErrorCode#NOTICE_NOT_FOUND})</li>
+     *     <li>공지사항이 요청한 그룹에 속하는지 {@link Notice#verifyBelongsToGroup(Long)}으로 검증</li>
+     *     <li>요청 사용자의 그룹장 권한을 {@code verifyAuthentification}으로 검증</li>
+     *     <li>권한 검증 후 공지사항을 삭제</li>
+     * </ol>
+     *
+     * @param groupId  삭제 대상 공지사항이 속한 그룹의 식별자
+     * @param noticeId 삭제할 공지사항의 식별자
+     * @param memberId 요청자 회원 식별자
+     *
+     * @throws ServiceException 공지사항을 찾을 수 없거나 그룹이 일치하지 않을 경우
+     * @throws DomainException 요청자가 삭제 권한이 없는 경우
+     *
+     * @implNote 본 메서드는 트랜잭션 범위에서 실행되며,
+     *           삭제 중 예외 발생 시 전체 작업이 롤백됩니다.
+     *
+     * @see Notice#verifyBelongsToGroup(Long)
+     * @see #verifyAuthentification(Long, Long)
+     */
+    @Override
+    @Transactional
+    public void deleteNotice(Long groupId, Long noticeId, Long memberId) {
+        log.info("[NOTICE][DELETE][START] groupId={}, noticeId={}, memberId={} - 공지사항 삭제 요청 시작",
+                groupId, noticeId, memberId);
+
+        // 공지사항 ID로 공지사항 조회 (없으면 예외)
+        Notice notice = noticeRepository.findByNoticeId(noticeId).orElseThrow(() ->
+                new ServiceException(ErrorCode.NOTICE_NOT_FOUND));
+
+        // 그룹 ID와 일치하는지 확인 (다르면 예외)
+        notice.verifyBelongsToGroup(groupId);
+
+        // 권한 검증
+        verifyAuthentification(memberId, groupId);
+
+        // 삭제
+        noticeRepository.deleteById(noticeId);
+
+        log.info("[NOTICE][DELETE][END] groupId={}, noticeId={}, memberId={} - 공지사항 삭제 완료",
+                groupId, noticeId, memberId);
+    }
+
+    /**
      * 지정된 그룹에서 해당 회원이 그룹장 권한을 가지고 있는지 검증한다.
      * <p>
      * 1. 멤버 ID와 그룹 ID로 그룹 멤버 정보를 조회
