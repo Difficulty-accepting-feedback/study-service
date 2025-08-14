@@ -69,9 +69,9 @@ public class Notice {
      * @implNote 주로 서비스 계층에서, 리소스 접근 권한 검증 전후에 사용됩니다.
      */
     public void verifyBelongsToGroup(Long expectedGroupId) {
-        log.warn("[NOTICE][DELETE][UNAUTHORIZED] groupId={}, noticeId={} - 그룹 ID와 공지사항 그룹 ID가 일치하지 않음",
-                expectedGroupId, noticeId);
         if (!this.groupId.equals(expectedGroupId)) {
+            log.warn("[NOTICE][DELETE][UNAUTHORIZED] groupId={}, noticeId={} - 그룹 ID와 공지사항 그룹 ID가 일치하지 않음",
+                    expectedGroupId, noticeId);
             throw new DomainException(ErrorCode.GROUP_NOT_MATCH);
         }
     }
