@@ -10,4 +10,5 @@ public interface NoticeRepository {
     void saveAll(List<Notice> notices);
     Optional<Notice> findByNoticeId(Long noticeId);
     List<Notice> findByGroupId(Long groupId);
+    void deleteById(Long noticeId);
 }
