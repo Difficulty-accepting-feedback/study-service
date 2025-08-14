@@ -4,6 +4,7 @@ import com.grow.study_service.common.exception.domain.DomainException;
 import com.grow.study_service.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 그룹 공지사항 도메인.
@@ -14,6 +15,7 @@ import lombok.Getter;
  *   <li>{@link #of(Long, Long, String, boolean)} - 조회 후 복원</li>
  * </ul>
  */
+@Slf4j
 @Getter
 @AllArgsConstructor
 public class Notice {
@@ -52,5 +54,25 @@ public class Notice {
             throw new DomainException(ErrorCode.NOTICE_ID_IS_EMPTY);
         }
         return new Notice(noticeId, groupId, content, isPinned);
+    }
+
+    /**
+     * 해당 공지사항이 특정 그룹에 속하는지 검증합니다.
+     * <p>
+     * 이 메서드는 공지사항 엔티티의 {@code groupId}와 전달받은 {@code expectedGroupId}를 비교하여
+     * 다를 경우 {@link DomainException}을 발생시킵니다.
+     *
+     * @param expectedGroupId 검증 대상 그룹 ID
+     *
+     * @throws DomainException 공지사항이 지정한 그룹에 속하지 않는 경우
+     *
+     * @implNote 주로 서비스 계층에서, 리소스 접근 권한 검증 전후에 사용됩니다.
+     */
+    public void verifyBelongsToGroup(Long expectedGroupId) {
+        log.warn("[NOTICE][DELETE][UNAUTHORIZED] groupId={}, noticeId={} - 그룹 ID와 공지사항 그룹 ID가 일치하지 않음",
+                expectedGroupId, noticeId);
+        if (!this.groupId.equals(expectedGroupId)) {
+            throw new DomainException(ErrorCode.GROUP_NOT_MATCH);
+        }
     }
 }
