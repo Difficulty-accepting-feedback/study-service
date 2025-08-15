@@ -42,7 +42,14 @@ public enum ErrorCode {
     NOTICE_CONTENT_IS_EMPTY("400", "공지 내용은 비어있을 수 없습니다."),
     NOTICE_ID_IS_EMPTY("400", "공지사항 아이디는 비어있을 수 없습니다." ),
     NOTICE_NOT_FOUND("404", "공지사항을 찾을 수 없습니다."),
-    GROUP_NOT_MATCH("403", "그룹과 게시판이 일치하지 않습니다.");
+    GROUP_NOT_MATCH("403", "그룹과 게시판이 일치하지 않습니다."),
+
+    /**
+     * 📌 4. 게시글(Post) 관련
+     */
+    TITLE_IS_EMPTY("400", "제목은 비어있을 수 없습니다." ),
+    CONTENT_IS_EMPTY("400", "내용은 비어있을 수 없습니다." ),
+    ;
 
     private final String code;
     private final String message;
