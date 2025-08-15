@@ -130,6 +130,10 @@ public class NoticeServiceImpl implements NoticeService {
         List<Notice> noticeList = noticeRepository.findByGroupId(groupId);
         log.info("[NOTICE][GET][DB] groupId={} - {}건 조회 완료", groupId, noticeList.size());
 
+        if (noticeList.isEmpty()) { // 공지사항이 없으면 빈 리스트를 반환
+            return List.of();
+        }
+
         // 3. 변환
         List<NoticeResponse> responseList = noticeList.stream()
                 .map(n -> new NoticeResponse(n.getNoticeId(), n.getContent(), n.isPinned()))
