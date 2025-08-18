@@ -1,6 +1,7 @@
 package com.grow.study_service.post.domain.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.grow.study_service.common.exception.ErrorCode;
 import com.grow.study_service.common.exception.domain.DomainException;
@@ -18,14 +19,19 @@ public class Post {
     private final LocalDateTime createdAt;
     private String title;
     private String content;
-    private String fileUrl;
     private LocalDateTime updatedAt;
 
     /**
      * 게시글을 생성하는 메서드
      */
-    public static Post create(Long boardId, Long memberId, String title,
-                              String content, String fileUrl) {
+    public static Post create(Long boardId, Long memberId, String title, String content) {
+        if (title == null || title.isBlank()) {
+            throw new DomainException(ErrorCode.TITLE_IS_EMPTY);
+        }
+        if (content == null || content.isBlank()) {
+            throw new DomainException(ErrorCode.CONTENT_IS_EMPTY);
+        }
+
         return new Post(
                 null,
                 boardId,
@@ -33,33 +39,37 @@ public class Post {
                 LocalDateTime.now(),
                 title,
                 content,
-                fileUrl,
                 null
         );
     }
 
     /**
      * 게시글 제목과 내용을 업데이트하는 메서드
+     * TODO 내용이 같은지 확인하고, 다른 경우에만 업데이트 할 수 있도록 변경
      */
-    public void update(String title, String content, String fileUrl, LocalDateTime now) {
+    public void update(String title, String content, LocalDateTime now) {
         if (title == null || title.isBlank()) {
             throw new DomainException(ErrorCode.TITLE_IS_EMPTY);
         }
         if (content == null || content.isBlank()) {
             throw new DomainException(ErrorCode.CONTENT_IS_EMPTY);
         }
+
         this.title = title;
         this.content = content;
-        this.fileUrl = fileUrl;
         this.updatedAt = now;
     }
 
     /**
      * 조회용 메서드
      */
-    public static Post of(Long postId, Long boardId, Long memberId,
-                          String title, String content, String fileUrl,
-                          LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public static Post of(Long postId,
+                          Long boardId,
+                          Long memberId,
+                          String title,
+                          String content,
+                          LocalDateTime createdAt,
+                          LocalDateTime updatedAt) {
         return new Post(
                 postId,
                 boardId,
@@ -67,7 +77,6 @@ public class Post {
                 createdAt,
                 title,
                 content,
-                fileUrl,
                 updatedAt
         );
     }
