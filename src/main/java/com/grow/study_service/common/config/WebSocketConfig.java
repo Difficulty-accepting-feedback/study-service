@@ -1,4 +1,4 @@
-package com.grow.study_service.board.config;
+package com.grow.study_service.common.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
