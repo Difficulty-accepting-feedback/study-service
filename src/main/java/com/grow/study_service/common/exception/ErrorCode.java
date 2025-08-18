@@ -42,7 +42,20 @@ public enum ErrorCode {
     NOTICE_CONTENT_IS_EMPTY("400", "공지 내용은 비어있을 수 없습니다."),
     NOTICE_ID_IS_EMPTY("400", "공지사항 아이디는 비어있을 수 없습니다." ),
     NOTICE_NOT_FOUND("404", "공지사항을 찾을 수 없습니다."),
-    GROUP_NOT_MATCH("403", "그룹과 게시판이 일치하지 않습니다.");
+    GROUP_NOT_MATCH("403", "그룹과 게시판이 일치하지 않습니다."),
+
+    /**
+     * 📌 4. 게시글(Post) 관련
+     */
+    TITLE_IS_EMPTY("400", "제목은 비어있을 수 없습니다." ),
+    CONTENT_IS_EMPTY("400", "내용은 비어있을 수 없습니다." ),
+    POST_ID_IS_EMPTY("400", "게시글 아이디는 비어있을 수 없습니다." ),
+    ORIGINAL_NAME_IS_EMPTY("400", "원본 파일 이름은 비어있을 수 없습니다." ),
+    STORED_NAME_IS_EMPTY("400", "저장된 파일 이름은 비어있을 수 없습니다." ),
+    CONTENT_TYPE_IS_EMPTY("400", "파일 타입은 비어있을 수 없습니다." ),
+    SIZE_IS_NEGATIVE("400", "파일 크기는 0보다 커야합니다." ),
+    PATH_IS_EMPTY("400", "파일 경로는 비어있을 수 없습니다." ),
+    FILE_UPLOAD_FAILED("500", "파일 업로드에 실패했습니다." ),;
 
     private final String code;
     private final String message;
