@@ -35,6 +35,7 @@ public enum ErrorCode {
     BOARD_TYPE_IS_EMPTY("400", "게시판 타입은 비어있을 수 없습니다."),
     BOARD_ID_IS_EMPTY("400", "게시판 아이디는 비어있을 수 없습니다."),
     BOARD_CREATED_AT_IS_EMPTY("400", "게시판 생성 시각은 비어있을 수 없습니다."),
+    BOARD_NOT_FOUND("404", "게시판을 찾을 수 없습니다." ),
 
     /**
      * 📌 4. 공지사항(Notice) 관련
