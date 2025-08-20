@@ -7,11 +7,14 @@ import com.grow.study_service.post.domain.repository.FileMetaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,15 +48,10 @@ public class FileServiceImpl implements FileService {
      *
      * @param postId 게시글 ID (파일 메타정보의 소유 게시글 식별자)
      * @param files  업로드할 MultipartFile 목록 (null 또는 빈 리스트 가능)
-     *
      * @return 저장된 파일들의 FileMeta 리스트 (파일이 없거나 모두 skip된 경우 빈 리스트)
-     *
-     * @throws com.grow.study_service.common.exception.service.ServiceException
-     *         파일 저장 중 I/O 예외 발생 시 저장된 파일들을 정리한 뒤 업로드 실패 에러로 래핑하여 던짐
-     *
+     * @throws com.grow.study_service.common.exception.service.ServiceException 파일 저장 중 I/O 예외 발생 시 저장된 파일들을 정리한 뒤 업로드 실패 에러로 래핑하여 던짐
      * @implNote 물리 파일 시스템과 DB를 함께 다루므로, 파일 저장 중 예외가 발생하면 이미 저장된 파일을 정리(cleanup)합니다.
-     *           저장 경로는 업로드 루트 경로 하위에 날짜 폴더(yyyy-MM-dd)로 구성되며, 파일명은 UUID 기반으로 생성됩니다.
-     *
+     * 저장 경로는 업로드 루트 경로 하위에 날짜 폴더(yyyy-MM-dd)로 구성되며, 파일명은 UUID 기반으로 생성됩니다.
      * @see #resolveTargetPath(String)
      * @see #cleanupStoredFiles(java.util.List)
      */
@@ -117,15 +115,55 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
+     * [파일 다운로드 링크 생성]
+     * <p>
+     * 주어진 파일 ID를 기반으로 파일의 다운로드 링크를 생성합니다.
+     * 파일 메타 정보를 조회하고, 유효한 파일 경로를 확인한 후 URL 리소스를 반환합니다.
+     *
+     * <ol>
+     *     <li>파일 ID로 파일 메타 정보를 데이터베이스에서 조회합니다.</li>
+     *     <li>파일 경로를 Path 객체로 변환합니다.</li>
+     *     <li>URL 리소스를 생성하여 반환합니다.</li>
+     * </ol>
+     *
+     * @param fileId 파일의 고유 ID (Long 타입)
+     *
+     * @return 파일 다운로드를 위한 Resource 객체 (UrlResource)
+     *
+     * @throws ServiceException 파일이 존재하지 않을 경우 (ErrorCode.FILE_NOT_FOUND) 또는 파일 경로가 유효하지 않을 경우 (ErrorCode.FILE_PATH_INVALID)
+     *
+     * @implNote 파일 경로가 잘못된 경우 MalformedURLException을 ServiceException으로 래핑하여 처리합니다.
+     *           이 메서드는 파일 시스템 접근을 포함하므로, 보안 및 권한 확인이 필요할 수 있습니다.
+     *
+     * @see FileMetaRepository#findById(Long)
+     */
+    @Override
+    public Resource getDownloadLink(Long fileId) {
+        FileMeta fileMeta = fileMetaRepository.findById(fileId).orElseThrow(() ->
+                new ServiceException(ErrorCode.FILE_NOT_FOUND));
+
+        Path filePath = Paths.get(fileMeta.getPath());
+        try {
+            return new UrlResource(filePath.toUri());
+        } catch (MalformedURLException e) {
+            throw new ServiceException(e, ErrorCode.FILE_PATH_INVALID);
+        }
+    }
+
+    @Override
+    public FileMeta getFileMeta(Long fileId) {
+        return fileMetaRepository.findById(fileId).orElseThrow(() ->
+                new ServiceException(ErrorCode.FILE_NOT_FOUND));
+    }
+
+    /**
      * 파일 저장 대상 경로 생성
      * <p>
      * 업로드 루트 경로 하위에 날짜별 디렉터리(yyyy-MM-dd)를 생성하고, UUID 기반 파일명을 확장자와 함께 구성합니다.
      * 예: {uploadPath}/2025-08-18/f1e2d3c4b5a697887766554433221100.pdf
      *
      * @param originalName 원본 파일명
-     *
      * @return 물리 저장 대상 Path
-     *
      * @implNote 확장자는 원본 파일명에서 마지막 '.' 기준으로 추출하며, 없으면 확장자 없이 저장됩니다.
      */
     private Path resolveTargetPath(String originalName) {
@@ -145,7 +183,6 @@ public class FileServiceImpl implements FileService {
      * 파일명의 마지막 '.' 이후 문자열을 확장자로 간주합니다. 확장자가 없으면 빈 문자열을 반환합니다.
      *
      * @param filename 파일명
-     *
      * @return 확장자(점 제외), 확장자가 없으면 빈 문자열
      */
     private String extractExtension(String filename) {
@@ -161,7 +198,6 @@ public class FileServiceImpl implements FileService {
      * 업로드 과정에서 예외가 발생한 경우, 이미 저장된 파일들을 삭제하여 일관성을 유지합니다.
      *
      * @param paths 삭제 대상 파일 경로 리스트
-     *
      * @implNote 삭제 중 발생하는 예외는 무시합니다. 업로드 전반의 실패를 상위 예외로 처리합니다.
      */
     private void cleanupStoredFiles(List<Path> paths) {
