@@ -24,7 +24,6 @@ public class PostController {
     private final PostSaveService postSaveService;
     private final PostFindService postFindService;
 
-
     @Operation(
             summary = "게시글 생성",
             description = "회원 ID와 게시글 내용을 받아 새로운 게시글을 생성합니다."
@@ -33,7 +32,7 @@ public class PostController {
     @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
     @ApiResponse(responseCode = "500", description = "서버 오류")
     @PostMapping("/save")
-    public RsData<Long> createPost(@RequestHeader("X-Authorization-Id") Long memberId,
+    public RsData<PostResponse> createPost(@RequestHeader("X-Authorization-Id") Long memberId,
                                            @RequestPart("post") PostSaveRequest request,
                                            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
 
@@ -41,7 +40,7 @@ public class PostController {
 
         return new RsData<>("201",
                 "글 작성 완료",
-                createdPost.getPostId() // 글 작성 성공 시 생성된 게시글 ID 반환 -> 바로 조회 가능하도록
+                createdPost // 글 작성 성공 시 생성된 게시글 ID 반환 -> 바로 조회 가능하도록
         );
     }
 
