@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -34,5 +35,10 @@ public class FileMetaRepositoryImpl implements FileMetaRepository {
                 .stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<FileMeta> findById(Long fileId) {
+        return jpaRepository.findById(fileId).map(mapper::toDomain);
     }
 }
