@@ -36,7 +36,7 @@ public class PostResponse {
                         m.getStoredName(),
                         m.getContentType(),
                         m.getSize(),
-                        m.getPath()
+                        "/api/v1/posts/download/" + m.getFileId()  // 다운로드 URL로 설정
                 ))
                 .toList();
 
