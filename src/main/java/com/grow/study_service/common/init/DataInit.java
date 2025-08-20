@@ -6,18 +6,20 @@ import com.grow.study_service.group.domain.repository.GroupRepository;
 import com.grow.study_service.groupmember.domain.enums.Role;
 import com.grow.study_service.groupmember.domain.model.GroupMember;
 import com.grow.study_service.groupmember.domain.repository.GroupMemberRepository;
+import com.grow.study_service.post.domain.model.Post;
+import com.grow.study_service.post.domain.repository.PostRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
+// @Component
 @AllArgsConstructor
 public class DataInit implements CommandLineRunner {
 
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final PostRepository postRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -29,6 +31,14 @@ public class DataInit implements CommandLineRunner {
 
         groupMemberRepository.save(groupMember);
         groupMemberRepository.save(groupLeader);
+
+        Post post1 = Post.create(1L, 1L, "첫 번째 게시글 제목", "첫 번째 게시글 내용");
+        Post post2 = Post.create(1L, 2L, "두 번째 게시글 제목", "두 번째 게시글 내용");
+        Post post3 = Post.create(1L, 1L, "세 번째 게시글 제목", "세 번째 게시글 내용");
+
+        postRepository.save(post1);
+        postRepository.save(post2);
+        postRepository.save(post3);
 
         log.info("Data init completed.");
     }
