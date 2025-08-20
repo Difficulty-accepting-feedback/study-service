@@ -54,7 +54,7 @@ public class PostSaveServiceImpl implements PostSaveService {
     @Transactional
     public PostResponse createPost(Long memberId, PostSaveRequest request, List<MultipartFile> files) {
         log.info("[NOTICE][POST][SAVE][START] 게시물 저장 시작 - memberId={}, boardId={}, fileCount={}",
-                memberId, request.getBoardId(), files.size());
+                memberId, request.getBoardId(), (files == null ? 0 : files.size()));
 
         Post post = Post.create(
                 request.getBoardId(),
@@ -72,7 +72,7 @@ public class PostSaveServiceImpl implements PostSaveService {
                 : fileService.storeFilesForPost(saved.getPostId(), files);
 
         log.info("[NOTICE][POST][SAVE][END] 게시물 저장 완료 - postId={}, savedCount={}, fileCount={}",
-                saved.getPostId(), savedMetas.size(), files.size());
+                saved.getPostId(), savedMetas.size(), (files == null ? 0 : files.size()));
         return PostResponse.of(saved, savedMetas);
     }
 }
