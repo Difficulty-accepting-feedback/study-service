@@ -6,6 +6,7 @@ import com.grow.study_service.post.application.find.PostFindService;
 import com.grow.study_service.post.application.save.PostSaveService;
 import com.grow.study_service.post.presentation.dto.request.PostSaveRequest;
 import com.grow.study_service.post.presentation.dto.response.PostResponse;
+import com.grow.study_service.post.presentation.dto.response.PostSimpleResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -85,4 +86,15 @@ public class PostController {
     // 글 삭제를 위한 API
 
     // 목록 전체 조회를 위한 API
+    @GetMapping("/list")
+    public RsData<List<PostSimpleResponse>> getPostList(@RequestHeader("X-Authorization-Id") Long memberId,
+                                                        @RequestParam("boardId") Long boardId) {
+
+        List<PostSimpleResponse> response = postFindService.getPostList(memberId, boardId);
+
+        return new RsData<>("200",
+                "글 목록 조회 완료",
+                response
+        );
+    }
 }
