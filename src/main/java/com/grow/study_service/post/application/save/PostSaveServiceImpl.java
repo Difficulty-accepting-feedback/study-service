@@ -53,12 +53,8 @@ public class PostSaveServiceImpl implements PostSaveService {
     @Override
     @Transactional
     public PostResponse createPost(Long memberId, PostSaveRequest request, List<MultipartFile> files) {
-        log.info("[NOTICE][POST][SAVE][START] 게시물 저장 시작 - memberId={}, boardId={}, titleLen={}, contentLen={}, fileCount={}",
-                memberId,
-                (request != null ? request.getBoardId() : null),
-                (request != null && request.getTitle() != null ? request.getTitle().length() : 0),
-                (request != null && request.getContent() != null ? request.getContent().length() : 0),
-                (files == null ? 0 : files.size()));
+        log.info("[NOTICE][POST][SAVE][START] 게시물 저장 시작 - memberId={}, boardId={}, fileCount={}",
+                memberId, request.getBoardId(), files.size());
 
         Post post = Post.create(
                 request.getBoardId(),

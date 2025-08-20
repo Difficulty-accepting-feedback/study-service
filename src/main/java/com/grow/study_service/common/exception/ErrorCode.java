@@ -25,7 +25,7 @@ public enum ErrorCode {
     GROUP_MEMBER_JOINED_AT_IS_EMPTY("400", "그룹 멤버가 가입한 시각은 비어있을 수 없습니다."),
     GROUP_MEMBER_ID_IS_EMPTY("400", "그룹 멤버 아이디는 비어있을 수 없습니다."),
     GROUP_MEMBER_NOT_FOUND("404", "그룹 멤버를 찾을 수 없습니다."),
-    MEMBER_NOT_IN_GROUP("403", "그룹 멤버가 아닙니다." ),
+    MEMBER_NOT_IN_GROUP("403", "그룹 멤버가 아닙니다. 접근 권한이 없습니다." ),
 
     /**
      * 📌 3. 게시판(Board) 관련
@@ -55,8 +55,9 @@ public enum ErrorCode {
     CONTENT_TYPE_IS_EMPTY("400", "파일 타입은 비어있을 수 없습니다." ),
     SIZE_IS_NEGATIVE("400", "파일 크기는 0보다 커야합니다." ),
     PATH_IS_EMPTY("400", "파일 경로는 비어있을 수 없습니다." ),
-    FILE_UPLOAD_FAILED("500", "파일 업로드에 실패했습니다." ),;
-
+    FILE_UPLOAD_FAILED("500", "파일 업로드에 실패했습니다." ),
+    POST_NOT_FOUND("404", "게시글을 찾을 수 없습니다." ),
+    ;
     private final String code;
     private final String message;
 }
