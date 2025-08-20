@@ -57,7 +57,8 @@ public enum ErrorCode {
     PATH_IS_EMPTY("400", "파일 경로는 비어있을 수 없습니다." ),
     FILE_UPLOAD_FAILED("500", "파일 업로드에 실패했습니다." ),
     POST_NOT_FOUND("404", "게시글을 찾을 수 없습니다." ),
-    ;
+    FILE_NOT_FOUND("404", "파일을 찾을 수 없습니다." ),
+    FILE_PATH_INVALID("400", "파일 경로가 올바르지 않습니다."),;
     private final String code;
     private final String message;
 }
