@@ -78,4 +78,56 @@ public class Post {
                 updatedAt
         );
     }
+
+    /**
+     * [게시글 소유자 검증 메서드]
+     * <p>
+     * 현재 게시글의 소유자가 입력된 memberId와 일치하는지 확인합니다.
+     * 필요한 경우 내부 처리 절차를 순서대로 기술할 수 있습니다.
+     *
+     * <ol>
+     *     <li>memberId 비교</li>
+     *     <li>불일치 시 예외 발생</li>
+     * </ol>
+     *
+     * @param memberId 검증할 회원 ID
+     *
+     * @throws DomainException 소유자가 아닐 경우
+     *
+     * @see ErrorCode#NOT_AUTHORIZED_USER
+     */
+    public void validateMember(Long memberId) {
+        if (this.memberId != memberId) {
+            throw new DomainException(ErrorCode.NOT_AUTHORIZED_USER);
+        }
+    }
+
+    /**
+     * [게시글 업데이트 메서드 (변경 여부 확인)]
+     * <p>
+     * 제목과 내용이 기존과 다른 경우에만 업데이트하며, 업데이트 시간을 설정합니다.
+     * 필요한 경우 내부 처리 절차를 순서대로 기술할 수 있습니다.
+     *
+     * <ol>
+     *     <li>제목 변경 확인</li>
+     *     <li>내용 변경 확인</li>
+     *     <li>업데이트 시간 설정</li>
+     * </ol>
+     *
+     * @param title 새로운 제목 (null 또는 빈 값 무시)
+     * @param content 새로운 내용 (null 또는 빈 값 무시)
+     *
+     * @implNote 변경 여부 확인으로 불필요한 업데이트 방지
+     */
+    public void update(String title, String content) {
+        if (!this.title.equals(title) && title != null && !title.isBlank()) {
+            this.title = title;
+        }
+
+        if (!this.content.equals(content) && content != null && !content.isBlank()) {
+            this.content = content;
+        }
+
+        this.updatedAt = LocalDateTime.now();
+    }
 }
