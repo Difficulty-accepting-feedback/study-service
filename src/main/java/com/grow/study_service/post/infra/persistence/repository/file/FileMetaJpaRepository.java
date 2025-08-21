@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface FileMetaJpaRepository extends JpaRepository<FileMetaJpaEntity, Long> {
     List<FileMetaJpaEntity> findAllByPostId(Long postId);
+    List<FileMetaJpaEntity> findByPostId(Long postId);
 }

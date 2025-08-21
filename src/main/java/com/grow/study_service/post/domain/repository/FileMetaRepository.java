@@ -9,4 +9,6 @@ public interface FileMetaRepository {
     FileMeta save(FileMeta fileMeta);
     List<FileMeta> findAllByPostId(Long postId);
     Optional<FileMeta> findById(Long fileId);
+    List<FileMeta> findByPostId(Long postId);
+    void delete(FileMeta meta);
 }

@@ -41,4 +41,17 @@ public class FileMetaRepositoryImpl implements FileMetaRepository {
     public Optional<FileMeta> findById(Long fileId) {
         return jpaRepository.findById(fileId).map(mapper::toDomain);
     }
+
+    @Override
+    public List<FileMeta> findByPostId(Long postId) {
+        return jpaRepository.findByPostId(postId)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public void delete(FileMeta meta) {
+        jpaRepository.delete(mapper.toEntity(meta));
+    }
 }
