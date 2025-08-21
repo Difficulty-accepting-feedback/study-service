@@ -50,9 +50,6 @@ public class PostSaveUpdatePostTest {
     @Autowired
     FileMetaRepository fileMetaRepository;
 
-    @TempDir // 임시 디렉토리 선택
-    Path tempDir;
-
     private Long seedPost(Long boardId, Long authorMemberId, String title, String content, List<MultipartFile> files) {
         PostSaveRequest req = new PostSaveRequest(boardId, title, content);
         PostResponse created = postSaveService.createPost(authorMemberId, req, files);
