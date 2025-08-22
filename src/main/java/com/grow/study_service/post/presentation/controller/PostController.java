@@ -5,6 +5,7 @@ import com.grow.study_service.common.rsdata.RsData;
 import com.grow.study_service.post.application.find.PostFindService;
 import com.grow.study_service.post.application.save.PostSaveService;
 import com.grow.study_service.post.presentation.dto.request.PostSaveRequest;
+import com.grow.study_service.post.presentation.dto.request.PostUpdateRequest;
 import com.grow.study_service.post.presentation.dto.response.PostResponse;
 import com.grow.study_service.post.presentation.dto.response.PostSimpleResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -82,6 +83,19 @@ public class PostController {
     }
 
     // 글 수정을 위한 API
+    @PutMapping("/{postId}")
+    public RsData<Long> updatePost(@RequestHeader("X-Authorization-Id") Long memberId, // 본인 확인 용도
+                                     @PathVariable("postId") Long postId, // 업데이트 할 포스트 찾는 용도
+                                     @RequestPart("post") PostUpdateRequest request, // 업데이트 내용
+                                     @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+
+        postSaveService.updatePost(memberId, postId, request, files);
+
+        return new RsData<>("200",
+                "글 수정 완료",
+                postId // ID 를 기반으로 라우팅
+        );
+    }
 
     // 글 삭제를 위한 API
 

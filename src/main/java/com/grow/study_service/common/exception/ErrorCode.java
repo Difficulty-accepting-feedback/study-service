@@ -59,7 +59,11 @@ public enum ErrorCode {
     FILE_UPLOAD_FAILED("500", "파일 업로드에 실패했습니다." ),
     POST_NOT_FOUND("404", "게시글을 찾을 수 없습니다." ),
     FILE_NOT_FOUND("404", "파일을 찾을 수 없습니다." ),
-    FILE_PATH_INVALID("400", "파일 경로가 올바르지 않습니다."),;
+    FILE_PATH_INVALID("400", "파일 경로가 올바르지 않습니다."),
+    NOT_AUTHORIZED_USER("403", "글을 수정할 권한이 없습니다." ),
+    FILE_DELETE_FAILED("500", "파일 삭제에 실패했습니다." ),
+    ;
+
     private final String code;
     private final String message;
 }

@@ -9,6 +9,6 @@ import java.util.List;
 public interface FileService {
     List<FileMeta> storeFilesForPost(Long postId, List<MultipartFile> files);
     Resource getDownloadLink(Long fileId);
-
     FileMeta getFileMeta(Long fileId);
+    void deleteFilesForPost(Long postId);
 }

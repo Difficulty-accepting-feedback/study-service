@@ -115,6 +115,49 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
+     * [게시글 연관 파일 삭제]
+     * <p>
+     * 주어진 게시글 ID에 연관된 모든 파일 메타정보를 조회하고, 해당 파일들을 파일시스템과 DB에서 삭제합니다.
+     *
+     * <ol>
+     *     <li>게시글 ID로 파일 메타 목록 조회</li>
+     *     <li>각 파일의 물리 파일 삭제</li>
+     *     <li>파일 메타 DB 삭제</li>
+     * </ol>
+     *
+     * @param postId 삭제 대상 게시글 ID
+     *
+     * @throws ServiceException 파일 삭제 중 오류 발생 시
+     *
+     * @implNote 트랜잭션 적용으로 데이터 일관성 유지, 삭제 실패 시 롤백
+     */
+    @Transactional
+    public void deleteFilesForPost(Long postId) {
+        List<FileMeta> metas = fileMetaRepository.findByPostId(postId);
+
+        if (metas.isEmpty()) {
+            log.info("[NOTICE][FILE][DELETE][SKIP] postId={} - 파일 없음, 삭제 진행 취소", postId);
+            return;
+        }
+
+        List<Path> paths = new ArrayList<>();
+        for (FileMeta meta : metas) {
+            paths.add(Paths.get(meta.getPath()));
+            fileMetaRepository.delete(meta); // 파일 메타정보 삭제
+        }
+
+        try {
+            cleanupStoredFiles(paths); // 물리 파일 삭제
+        } catch (Exception e) {
+            log.warn("[NOTICE][FILE][DELETE][ERROR] postId={} - 파일 삭제 중 예외 발생, 삭제 진행 취소: {}",
+                    postId, e.toString());
+            throw new ServiceException(e, ErrorCode.FILE_DELETE_FAILED);
+        }
+
+        log.info("[NOTICE][FILE][DELETE][END] postId={} - 파일 삭제 완료", postId);
+    }
+
+    /**
      * [파일 다운로드 링크 생성]
      * <p>
      * 주어진 파일 ID를 기반으로 파일의 다운로드 링크를 생성합니다.
@@ -151,6 +194,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public FileMeta getFileMeta(Long fileId) {
         return fileMetaRepository.findById(fileId).orElseThrow(() ->
                 new ServiceException(ErrorCode.FILE_NOT_FOUND));
