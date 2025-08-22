@@ -1,4 +1,4 @@
-package com.grow.study_service.post.application.file;
+package com.grow.study_service.post.application.file.save;
 
 import com.grow.study_service.post.domain.model.FileMeta;
 import org.springframework.core.io.Resource;
