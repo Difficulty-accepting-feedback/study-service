@@ -2,7 +2,8 @@ package com.grow.study_service.post.application.save;
 
 import com.grow.study_service.common.exception.ErrorCode;
 import com.grow.study_service.common.exception.service.ServiceException;
-import com.grow.study_service.post.application.file.FileService;
+import com.grow.study_service.post.application.file.save.FileService;
+import com.grow.study_service.post.application.file.delete.FileDeleteService;
 import com.grow.study_service.post.domain.model.FileMeta;
 import com.grow.study_service.post.domain.model.Post;
 import com.grow.study_service.post.domain.repository.PostRepository;
@@ -25,6 +26,7 @@ public class PostSaveServiceImpl implements PostSaveService {
 
     private final PostRepository postRepository;
     private final FileService fileService;
+    private final FileDeleteService fileDeleteService;
 
     /**
      * 게시글 생성
@@ -50,7 +52,7 @@ public class PostSaveServiceImpl implements PostSaveService {
      * @implNote 트랜잭션이 적용되며, 파일 저장은 영속화와 분리된 외부 자원 접근을 포함합니다.
      *           파일 저장 실패 시 ServiceException을 던지며, 저장된 물리 파일은 정리됩니다.
      *
-     * @see com.grow.study_service.post.application.file.FileService#storeFilesForPost(Long, java.util.List)
+     * @see FileService#storeFilesForPost(Long, java.util.List)
      * @see com.grow.study_service.post.presentation.dto.response.PostResponse
      */
     @Override
@@ -116,7 +118,7 @@ public class PostSaveServiceImpl implements PostSaveService {
         Post saved = postRepository.save(post);// 업데이트된 게시글 저장
 
         if (files != null && !files.isEmpty()) { // 첨부 파일이 있을 경우
-            fileService.deleteFilesForPost(postId); // 기존에 저장된 파일 삭제
+            fileDeleteService.deleteFilesForPost(postId); // 기존에 저장된 파일 삭제
             fileService.storeFilesForPost(saved.getPostId(), files); // 파일이 같음을 확인할 수 없음... 그냥 업데이트
         }
 

@@ -1,6 +1,6 @@
 package com.grow.study_service.post.presentation.controller;
 
-import com.grow.study_service.post.application.file.FileService;
+import com.grow.study_service.post.application.file.save.FileService;
 import com.grow.study_service.post.domain.model.FileMeta;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

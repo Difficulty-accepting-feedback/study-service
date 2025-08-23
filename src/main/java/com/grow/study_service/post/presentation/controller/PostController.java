@@ -2,6 +2,7 @@ package com.grow.study_service.post.presentation.controller;
 
 import com.grow.study_service.common.exception.service.ServiceException;
 import com.grow.study_service.common.rsdata.RsData;
+import com.grow.study_service.post.application.delete.PostDeleteService;
 import com.grow.study_service.post.application.find.PostFindService;
 import com.grow.study_service.post.application.save.PostSaveService;
 import com.grow.study_service.post.presentation.dto.request.PostSaveRequest;
@@ -25,6 +26,7 @@ public class PostController {
 
     private final PostSaveService postSaveService;
     private final PostFindService postFindService;
+    private final PostDeleteService postDeleteService;
 
     @Operation(
             summary = "게시글 생성",
@@ -98,6 +100,16 @@ public class PostController {
     }
 
     // 글 삭제를 위한 API
+    @DeleteMapping("/{postId}")
+    public RsData<Long> deletePost(@RequestHeader("X-Authorization-Id") Long memberId,
+                                     @PathVariable("postId") Long postId) {
+
+        postDeleteService.deletePost(memberId, postId);
+
+        return new RsData<>("200",
+                "글 삭제 완료"
+        );
+    }
 
     // 목록 전체 조회를 위한 API
     @GetMapping("/list")

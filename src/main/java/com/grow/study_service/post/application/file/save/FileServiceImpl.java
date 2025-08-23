@@ -1,4 +1,4 @@
-package com.grow.study_service.post.application.file;
+package com.grow.study_service.post.application.file.save;
 
 import com.grow.study_service.common.exception.ErrorCode;
 import com.grow.study_service.common.exception.service.ServiceException;
@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +28,7 @@ import java.util.*;
 public class FileServiceImpl implements FileService {
 
     private final FileMetaRepository fileMetaRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${file.upload.path}")
     private String uploadPath;

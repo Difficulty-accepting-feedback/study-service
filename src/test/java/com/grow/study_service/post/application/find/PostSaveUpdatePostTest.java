@@ -3,7 +3,8 @@ package com.grow.study_service.post.application.find;
 import com.grow.study_service.common.exception.ErrorCode;
 import com.grow.study_service.common.exception.domain.DomainException;
 import com.grow.study_service.common.exception.service.ServiceException;
-import com.grow.study_service.post.application.file.FileService;
+import com.grow.study_service.post.application.file.save.FileService;
+import com.grow.study_service.post.application.file.delete.FileDeleteService;
 import com.grow.study_service.post.application.save.PostSaveService;
 import com.grow.study_service.post.domain.model.Post;
 import com.grow.study_service.post.domain.repository.FileMetaRepository;
@@ -14,7 +15,6 @@ import com.grow.study_service.post.presentation.dto.response.PostResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +24,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Path;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,6 +45,9 @@ public class PostSaveUpdatePostTest {
 
     @MockitoSpyBean(name="fileServiceImpl")
     private FileService fileService;
+
+    @MockitoSpyBean
+    private FileDeleteService fileDeleteService;
 
     @Autowired
     FileMetaRepository fileMetaRepository;
@@ -195,7 +197,7 @@ public class PostSaveUpdatePostTest {
             assertThat(beforeName).isEqualTo("x.txt");
 
             // FileService 스텁: delete는 정상, store 에서 예외
-            Mockito.doNothing().when(fileService).deleteFilesForPost(eq(postId));
+            Mockito.doNothing().when(fileDeleteService).deleteFilesForPost(eq(postId));
             Mockito.doThrow(new ServiceException(ErrorCode.FILE_UPLOAD_FAILED))
                     .when(fileService).storeFilesForPost(eq(postId), anyList());
 
