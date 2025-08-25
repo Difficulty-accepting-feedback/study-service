@@ -2,62 +2,64 @@ package com.grow.study_service.comment.domain.model;
 
 import java.time.LocalDateTime;
 
+import com.grow.study_service.common.exception.ErrorCode;
+import com.grow.study_service.common.exception.domain.DomainException;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-
+@AllArgsConstructor
 public class Comment {
-	private final Long commentId;
-	private final Long postId;
-	private final Long memberId;
-	private Long parentId;
-	private String content;
-	private LocalDateTime createdAt;
-	private LocalDateTime updatedAt;
-	private LocalDateTime deletedAt;
+    private final Long commentId;
+    private final Long postId;
+    private final Long memberId;
+    private Long parentId; // 댓글의 부모 댓글 ID
+    private String content; // 댓글 내용
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-	private Comment(Long commentId, Long postId, Long memberId, Long parentId, String content,
-			LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
-		this.commentId = commentId;
-		this.postId = postId;
-		this.memberId = memberId;
-		this.parentId = parentId;
-		this.content = content;
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
-		this.deletedAt = deletedAt;
-	}
+    // 생성 메서드
+    public static Comment create(Long postId, Long memberId,
+                                 Long parentId, String content, LocalDateTime now) {
+        return new Comment(
+                null,
+                postId,
+                memberId,
+                parentId,
+                content,
+                now,
+                now
+        );
+    }
 
-	public static Comment create(Long postId, Long memberId, String content, LocalDateTime now) {
-		return new Comment(null, postId, memberId, null, content, now, now, null);
-	}
+    // 조회 메서드
+    public static Comment of(Long commentId, Long postId, Long memberId,
+                             Long parentId, String content,
+                             LocalDateTime createdAt, LocalDateTime updatedAt) {
+        return new Comment(
+                commentId,
+                postId,
+                memberId,
+                parentId,
+                content,
+                createdAt,
+                updatedAt
+        );
+    }
 
-	public void update(String content, LocalDateTime now) {
-		if (this.deletedAt != null) {
-			throw new IllegalStateException("삭제된 댓글은 수정할 수 없습니다.");
-		}
-		if (content == null || content.isBlank()) {
-			throw new IllegalArgumentException("댓글 내용은 비어 있을 수 없습니다.");
-		}
-		this.content   = content;
-		this.updatedAt = now;
-	}
+    public void update(String content) {
+        if (content == null || content.isBlank()) {
+            throw new DomainException(ErrorCode.COMMENT_CONTENT_IS_EMPTY);
+        }
 
-	public void replyTo(Long parentId, LocalDateTime now) {
-		this.parentId = parentId;
-		this.createdAt = now;
-		this.updatedAt = now;
-	}
+        if (!this.content.equals(content)) { // 내용이 변경되었으면
+            this.content = content;
+            this.updatedAt = LocalDateTime.now();
+        }
+    }
 
-	public void delete(LocalDateTime now) {
-		if (this.deletedAt != null) {
-			throw new IllegalStateException("이미 삭제된 댓글입니다.");
-		}
-		this.deletedAt = now;
-	}
-
-	public static Comment of(Long commentId, Long postId, Long memberId, Long parentId, String content,
-			LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
-		return new Comment(commentId, postId, memberId, parentId, content, createdAt, updatedAt, deletedAt);
-	}
+    public void replyTo(Long parentId) { 
+        this.parentId = parentId;
+        this.createdAt = LocalDateTime.now();
+    }
 }

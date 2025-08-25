@@ -62,7 +62,11 @@ public enum ErrorCode {
     FILE_PATH_INVALID("400", "파일 경로가 올바르지 않습니다."),
     NOT_AUTHORIZED_USER("403", "글을 수정할 권한이 없습니다." ),
     FILE_DELETE_FAILED("500", "파일 삭제에 실패했습니다." ),
-    ;
+
+    /**
+     * 📌 5. 댓글(comment) 관련
+     */
+    COMMENT_CONTENT_IS_EMPTY("400", "댓글 내용은 비어있을 수 없습니다." ),;
 
     private final String code;
     private final String message;

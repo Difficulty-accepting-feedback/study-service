@@ -1,7 +1,7 @@
-package com.grow.study_service.comment.infra.persistence.mapper;
+package com.grow.study_service.comment.infra.mapper;
 
 import com.grow.study_service.comment.domain.model.Comment;
-import com.grow.study_service.comment.infra.persistence.entity.CommentJpaEntity;
+import com.grow.study_service.comment.infra.entity.CommentJpaEntity;
 
 public class CommentMapper {
 	public static Comment toDomain(CommentJpaEntity e) {
@@ -12,8 +12,7 @@ public class CommentMapper {
 			e.getParentId(),
 			e.getContent(),
 			e.getCreatedAt(),
-			e.getUpdatedAt(),
-			e.getDeletedAt()
+			e.getUpdatedAt()
 		);
 	}
 	public static CommentJpaEntity toEntity(Comment d) {
@@ -25,7 +24,6 @@ public class CommentMapper {
 			.content(d.getContent())
 			.createdAt(d.getCreatedAt())
 			.updatedAt(d.getUpdatedAt())
-			.deletedAt(d.getDeletedAt())
 			.build();
 	}
 }

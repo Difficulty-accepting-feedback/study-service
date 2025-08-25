@@ -1,4 +1,4 @@
-package com.grow.study_service.comment.infra.persistence.repository;
+package com.grow.study_service.comment.infra.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 import com.grow.study_service.comment.domain.model.Comment;
-import com.grow.study_service.comment.infra.persistence.mapper.CommentMapper;
+import com.grow.study_service.comment.infra.mapper.CommentMapper;
 import com.grow.study_service.comment.domain.repository.CommentRepository;
 
 import lombok.RequiredArgsConstructor;
