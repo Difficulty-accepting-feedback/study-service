@@ -38,4 +38,19 @@ public class CommentRepositoryImpl implements CommentRepository {
 	public void delete(Comment comment) {
 		commentJpaRepository.delete(CommentMapper.toEntity(comment));
 	}
+
+	@Override
+	public boolean existsByPostIdAndMemberIdAndContent(Long postId, Long memberId, String content) {
+		return commentJpaRepository.existsByPostIdAndMemberIdAndContent(
+				postId, memberId, content
+		);
+	}
+
+	@Override
+	public List<Comment> getAllComments(Long postId) {
+		return commentJpaRepository.findByPostIdOrderByParentIdAscCreatedAtAsc(postId)
+				.stream()
+				.map(CommentMapper::toDomain)
+				.collect(Collectors.toList());
+	}
 }
