@@ -21,7 +21,7 @@ import java.util.List;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
-    private final GroupMemberRepository groupmemberRepository;
+    private final GroupMemberRepository groupMemberRepository;
 
     /**
      * [게시물에 댓글을 저장하는 메서드]
@@ -48,7 +48,7 @@ public class CommentServiceImpl implements CommentService {
                 memberId, postId);
 
         // 권한 검증 (단일 쿼리) -> 오류는 상세하게 적을 수 없는 단점
-        if (!groupmemberRepository.existsByMemberIdAndPostGroup(postId, memberId)) {
+        if (!groupMemberRepository.existsByMemberIdAndPostGroup(postId, memberId)) {
             throw new ServiceException(ErrorCode.INVALID_POST_ACCESS);
         }
 
@@ -94,7 +94,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(readOnly = true)
     public List<CommentResponse> getCommentsByPostId(Long postId, Long memberId) {
         // 권한 검증
-        if (!groupmemberRepository.existsByMemberIdAndPostGroup(postId, memberId)) {
+        if (!groupMemberRepository.existsByMemberIdAndPostGroup(postId, memberId)) {
             throw new ServiceException(ErrorCode.INVALID_POST_ACCESS);
         }
 
