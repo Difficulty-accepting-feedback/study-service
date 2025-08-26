@@ -16,6 +16,7 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    // 댓글 저장 API
     @PostMapping("{postId}")
     public RsData<CommentResponse> saveComment(@RequestHeader("X-Authorization-Id") Long memberId,
                                                @PathVariable("postId") Long postId,
@@ -30,6 +31,7 @@ public class CommentController {
         );
     }
 
+    // 댓글 조회 API
     @GetMapping("{postId}")
     public RsData<List<CommentResponse>> getComments(@RequestHeader("X-Authorization-Id") Long memberId,
                                                      @PathVariable("postId") Long postId) {
