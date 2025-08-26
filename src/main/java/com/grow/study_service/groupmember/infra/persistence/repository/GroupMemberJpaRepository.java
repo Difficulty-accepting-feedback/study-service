@@ -2,11 +2,11 @@ package com.grow.study_service.groupmember.infra.persistence.repository;
 
 import java.util.Optional;
 
-import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.grow.study_service.groupmember.infra.persistence.entity.GroupMemberJpaEntity;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface GroupMemberJpaRepository
 	extends JpaRepository<GroupMemberJpaEntity, Long> {
