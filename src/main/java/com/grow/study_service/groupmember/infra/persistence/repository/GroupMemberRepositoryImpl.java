@@ -69,4 +69,9 @@ public class GroupMemberRepositoryImpl implements GroupMemberRepository {
 	public boolean existsByGroupIdAndMemberId(Long groupId, Long memberId) {
 		return groupMemberJpaRepository.existsByGroupIdAndMemberId(groupId, memberId);
 	}
+
+	@Override
+	public boolean existsByMemberIdAndPostGroup(Long postId, Long memberId) {
+		return groupMemberJpaRepository.existsByMemberIdAndPostGroup(postId, memberId);
+	}
 }
