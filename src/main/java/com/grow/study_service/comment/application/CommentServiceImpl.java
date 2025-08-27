@@ -5,6 +5,7 @@ import com.grow.study_service.comment.domain.repository.CommentRepository;
 import com.grow.study_service.comment.presentation.dto.CommentResponse;
 import com.grow.study_service.comment.presentation.dto.CommentSaveRequest;
 import com.grow.study_service.common.exception.ErrorCode;
+import com.grow.study_service.common.exception.domain.DomainException;
 import com.grow.study_service.common.exception.service.ServiceException;
 import com.grow.study_service.groupmember.domain.repository.GroupMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,18 +26,18 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * [게시물에 댓글을 저장하는 메서드]
-     *
+     * <p>
      * 이 메서드는 주어진 게시물 ID와 회원 ID를 기반으로 댓글을 생성하고 저장합니다.
      * 저장 전에 다음 검증을 수행합니다:
      * - 회원의 게시물 접근 권한 확인 (groupmemberRepository를 통해 단일 쿼리로 검증).
      * - 동일한 회원이 동일한 게시물에 동일한 내용의 댓글을 중복으로 등록하지 않도록 확인.
-     *
+     * <p>
      * 낙관적 락(Optimistic Locking)을 사용하여 동시성 문제를 해결합니다.
      * 트랜잭션 관리를 통해 데이터 일관성을 유지합니다.
      *
      * @param memberId 댓글을 등록하는 회원의 ID
-     * @param postId 댓글이 등록될 게시물의 ID
-     * @param request 댓글 저장 요청 객체 (부모 댓글 ID, 내용 포함)
+     * @param postId   댓글이 등록될 게시물의 ID
+     * @param request  댓글 저장 요청 객체 (부모 댓글 ID, 내용 포함)
      * @return 저장된 댓글 정보를 담은 CommentResponse 객체
      * @throws ServiceException 권한 없음(INVALID_POST_ACCESS) 또는 중복 댓글(COMMENT_ALREADY_EXISTS) 시 발생
      */
@@ -78,12 +79,12 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * 특정 게시물(postId)에 달린 모든 댓글을 트리 구조(List<CommentResponse>)로 반환한다.
-     *
+     * <p>
      * 1. commentRepository.getAllComments(postId) 로 게시물의 모든 댓글을 한 번에 조회한다.
      * 2. parentId 가 null 인 댓글(루트 댓글)만 필터링한다.
      * 3. 각 루트 댓글에 대해 mapToResponseWithReplies(…) 를 재귀 호출하여
-     *    자식 댓글(replies)을 계층적으로 채운다.
-     *
+     * 자식 댓글(replies)을 계층적으로 채운다.
+     * <p>
      * Transactional(readOnly = true) 로 조회 전용 트랜잭션에서 동작하며,
      * DB 상태를 변경하지 않는다.
      *
@@ -110,11 +111,96 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
+     * [특정 게시물의 댓글을 수정하는 메서드]
+     *
+     * 이 메서드는 주어진 댓글 ID와 회원 ID를 기반으로 댓글 내용을 수정합니다.
+     * 수정 전에 다음 검증을 수행합니다:
+     * - 회원의 게시물 접근 권한 확인 (groupmemberRepository를 통해 단일 쿼리로 검증).
+     * - 댓글 작성자 본인 여부 확인 (도메인 validateMemberId 메서드 사용).
+     *
+     * 낙관적 락(Optimistic Locking)을 사용하여 동시성 문제를 해결합니다.
+     * 트랜잭션 관리를 통해 데이터 일관성을 유지합니다.
+     *
+     * @param memberId 댓글을 수정하는 회원의 ID
+     * @param postId 댓글이 속한 게시물의 ID
+     * @param commentId 수정할 댓글의 ID
+     * @param request 댓글 수정 요청 객체 (새로운 내용 포함)
+     * @return 수정된 댓글 정보를 담은 CommentResponse 객체
+     * @throws ServiceException 권한 없음(INVALID_POST_ACCESS) 또는 댓글 없음(COMMENT_NOT_FOUND) 시 발생
+     * @throws DomainException 본인 댓글 아닌 경우(INVALID_COMMENT_ACCESS) 시 발생
+     */
+    @Override
+    @Transactional
+    public CommentResponse updateComment(Long memberId, Long postId, Long commentId, CommentSaveRequest request) {
+        log.info("[COMMENT][UPDATE][START] memberId={}, commentId={} - 댓글 수정 요청 시작", memberId, commentId);
+
+        Comment comment = checkPermission(memberId, postId, commentId);
+
+        // 내용 업데이트 (낙관적 락으로 동시성 처리)
+        Comment updated = comment.update(request.getContent());
+
+        commentRepository.save(updated);
+
+        log.info("[COMMENT][UPDATE][END] memberId={}, commentId={} - 댓글 수정 성공", memberId, commentId);
+
+        return CommentResponse.of(updated);
+    }
+
+    /**
+     * [특정 댓글을 소프트 삭제하는 메서드]
+     *
+     * 이 메서드는 주어진 댓글 ID와 회원 ID를 기반으로 댓글을 소프트 삭제합니다.
+     * 삭제 전에 다음 검증을 수행합니다:
+     * - 회원의 게시물 접근 권한 확인 (groupmemberRepository를 통해 단일 쿼리로 검증).
+     * - 댓글 작성자 본인 여부 확인 (도메인 validateMemberId 메서드 사용).
+     *
+     * 소프트 삭제를 적용하여 isDeleted 플래그를 true로 설정하고, updatedAt을 갱신하며, 내용을 "삭제된 댓글입니다."로 변경합니다.
+     * 낙관적 락(Optimistic Locking)을 사용하여 동시성 문제를 해결합니다.
+     * 트랜잭션 관리를 통해 데이터 일관성을 유지합니다.
+     *
+     * @param commentId 삭제할 댓글의 ID
+     * @param postId 댓글이 속한 게시물의 ID
+     * @param memberId 삭제를 요청하는 회원의 ID
+     * @throws ServiceException 권한 없음(INVALID_POST_ACCESS) 또는 댓글 없음(COMMENT_NOT_FOUND) 시 발생
+     * @throws DomainException 본인 댓글 아닌 경우(INVALID_COMMENT_ACCESS) 시 발생
+     */
+    @Override
+    @Transactional
+    public void deleteComment(Long commentId, Long postId, Long memberId) {
+        log.info("[COMMENT][DELETE][START] commentId={}, postId={} - 댓글 삭제 요청 시작", commentId, postId);
+
+        // 기존 댓글 조회 (없으면 예외)
+        Comment comment = checkPermission(memberId, postId, commentId);
+
+        // 삭제 진행 (도메인 업데이트)
+        Comment updated = comment.softDelete();// 삭제 처리
+
+        // DB에 반영
+        commentRepository.save(updated);
+
+        log.info("[COMMENT][DELETE][END] commentId={}, postId={} - 댓글 삭제 성공", commentId, postId);
+    }
+
+    private Comment checkPermission(Long memberId, Long postId, Long commentId) {
+        // 기존 댓글 조회 (없으면 예외)
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
+                new ServiceException(ErrorCode.COMMENT_NOT_FOUND));
+
+        if (!groupMemberRepository.existsByMemberIdAndPostGroup(postId, memberId)) {
+            throw new ServiceException(ErrorCode.INVALID_POST_ACCESS);
+        }
+
+        // 권한 검증 (자신이 작성한 댓글만 수정 / 삭제할 수 있다)
+        comment.validateMemberId(memberId);
+        return comment;
+    }
+
+    /**
      * Comment 엔티티를 CommentResponse 로 변환한 뒤,
      * 재귀적으로 자식 댓글(replies)을 찾아 CommentResponse 에 채워 넣는 헬퍼 메서드.
      *
-     * @param comment      변환할 대상 댓글
-     * @param allComments  동일 게시물의 모든 댓글(루트·대댓글 포함)
+     * @param comment     변환할 대상 댓글
+     * @param allComments 동일 게시물의 모든 댓글(루트·대댓글 포함)
      * @return replies 가 계층적으로 채워진 CommentResponse
      */
     private CommentResponse mapToResponseWithReplies(Comment comment, List<Comment> allComments) {

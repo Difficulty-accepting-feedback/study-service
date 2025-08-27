@@ -17,7 +17,7 @@ public class CommentController {
     private final CommentService commentService;
 
     // 댓글 저장 API
-    @PostMapping("{postId}")
+    @PostMapping("/{postId}")
     public RsData<CommentResponse> saveComment(@RequestHeader("X-Authorization-Id") Long memberId,
                                                @PathVariable("postId") Long postId,
                                                @RequestBody CommentSaveRequest request) {
@@ -32,7 +32,7 @@ public class CommentController {
     }
 
     // 댓글 조회 API
-    @GetMapping("{postId}")
+    @GetMapping("/{postId}")
     public RsData<List<CommentResponse>> getComments(@RequestHeader("X-Authorization-Id") Long memberId,
                                                      @PathVariable("postId") Long postId) {
 
@@ -42,6 +42,37 @@ public class CommentController {
                 "200",
                 "댓글 조회 완료",
                 commentsByPostId
+        );
+    }
+
+    // 댓글 수정 API
+    @PutMapping("/{postId}/{commentId}")
+    public RsData<CommentResponse> updateComment(@RequestHeader("X-Authorization-Id") Long memberId,
+                                                 @PathVariable("postId") Long postId,
+                                                 @PathVariable("commentId") Long commentId,
+                                                 @RequestBody CommentSaveRequest request) {
+
+        CommentResponse response = commentService.updateComment(memberId, postId, commentId, request);
+
+        return new RsData<>(
+                "200",
+                "댓글 수정 완료",
+                response
+        );
+    }
+
+    // 댓글 삭제 API
+    @DeleteMapping("/{postId}/{commentId}")
+    public RsData<Void> deleteComment(@RequestHeader("X-Authorization-Id") Long memberId,
+                                      @PathVariable("postId") Long postId,
+                                      @PathVariable("commentId") Long commentId) {
+
+        commentService.deleteComment(commentId, postId, memberId);
+
+        return new RsData<>(
+                "200",
+                "댓글 삭제 완료",
+                null
         );
     }
 }

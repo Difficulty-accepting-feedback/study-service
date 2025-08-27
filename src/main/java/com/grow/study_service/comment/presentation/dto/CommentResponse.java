@@ -16,7 +16,8 @@ public class CommentResponse {
     private Long parentId;
     private Long memberId; // 작성자 ID
     private String content;
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt; // 작성 시간
+    private LocalDateTime updatedAt; // 수정 시간 (댓글 수정 시 사용), null 가능
     private List<CommentResponse> replies;  // 대댓글 리스트
 
     public static CommentResponse of(Comment comment) {
@@ -26,6 +27,7 @@ public class CommentResponse {
                 .memberId(comment.getMemberId())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
                 .replies(List.of())  // 기본 빈 리스트 (재귀에서 채움)
                 .build();
     }

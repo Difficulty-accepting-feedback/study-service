@@ -8,7 +8,6 @@ import com.grow.study_service.comment.domain.model.Comment;
 public interface CommentRepository {
 	Comment save(Comment comment);
 	Optional<Comment> findById(Long commentId);
-	List<Comment> findByPostId(Long postId);
 	void delete(Comment comment);
 	// 중복 확인: postId, memberId, content가 동일한 댓글 존재 여부
 	boolean existsByPostIdAndMemberIdAndContent(Long postId, Long memberId, String content);
