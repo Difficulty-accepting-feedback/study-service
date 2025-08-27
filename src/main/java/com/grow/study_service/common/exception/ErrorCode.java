@@ -68,7 +68,9 @@ public enum ErrorCode {
      */
     COMMENT_CONTENT_IS_EMPTY("400", "댓글 내용은 비어있을 수 없습니다."),
     INVALID_POST_ACCESS("403", "이 게시글에 접근할 권한이 없습니다. postId나 그룹 가입 상태를 확인해 주세요. "),
-    COMMENT_ALREADY_EXISTS("409", "이미 동일한 댓글이 존재합니다. " ),;
+    COMMENT_ALREADY_EXISTS("409", "이미 동일한 댓글이 존재합니다. " ),
+    COMMENT_NOT_FOUND("404", "댓글을 찾을 수 없습니다. "),
+    INVALID_COMMENT_ACCESS("403", "이 댓글에 접근할 권한이 없습니다. " ),;
 
     private final String code;
     private final String message;
