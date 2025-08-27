@@ -41,4 +41,7 @@ public class CommentJpaEntity {
 
 	@Version
 	private Long version; // Optimistic Lock
+
+	@Column
+	private boolean isDeleted; // 삭제 여부 (soft delete)
 }

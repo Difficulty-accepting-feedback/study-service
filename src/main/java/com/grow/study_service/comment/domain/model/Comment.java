@@ -17,6 +17,8 @@ public class Comment {
     private String content; // 댓글 내용
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean isDeleted;
+    private Long version;
 
     // 생성 메서드
     public static Comment create(Long postId, Long memberId,
@@ -28,14 +30,18 @@ public class Comment {
                 parentId,
                 content,
                 now,
-                now
+                now,
+                false,
+                null
         );
     }
 
     // 조회 메서드
-    public static Comment of(Long commentId, Long postId, Long memberId,
-                             Long parentId, String content,
-                             LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public static Comment of(Long commentId, Long postId,
+                             Long memberId, Long parentId,
+                             String content, LocalDateTime createdAt,
+                             LocalDateTime updatedAt, boolean isDeleted,
+                             Long version) {
         return new Comment(
                 commentId,
                 postId,
@@ -43,11 +49,13 @@ public class Comment {
                 parentId,
                 content,
                 createdAt,
-                updatedAt
+                updatedAt,
+                isDeleted,
+                version
         );
     }
 
-    public void update(String content) {
+    public Comment update(String content) {
         if (content == null || content.isBlank()) {
             throw new DomainException(ErrorCode.COMMENT_CONTENT_IS_EMPTY);
         }
@@ -56,10 +64,25 @@ public class Comment {
             this.content = content;
             this.updatedAt = LocalDateTime.now();
         }
+
+        return this; // 변경된 객체를 반환
     }
 
-    public void replyTo(Long parentId) { 
-        this.parentId = parentId;
-        this.createdAt = LocalDateTime.now();
+    public void validateMemberId(Long memberId) {
+        if (!this.memberId.equals(memberId)) {
+            throw new DomainException(ErrorCode.INVALID_COMMENT_ACCESS);
+        }
+    }
+
+    public Comment softDelete() {
+        this.isDeleted = true;
+        this.updatedAt = LocalDateTime.now();
+        this.content = "삭제된 댓글입니다."; // 댓글 내용을 변경하여 삭제된 댓글을 표시할 수 있도록 함
+
+        return this; // 변경된 객체를 반환
+    }
+
+    public void changeContent(String str) {
+        this.content = str;
     }
 }
