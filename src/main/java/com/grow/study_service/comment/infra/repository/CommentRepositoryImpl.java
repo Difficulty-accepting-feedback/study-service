@@ -15,42 +15,35 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class CommentRepositoryImpl implements CommentRepository {
-	private final CommentJpaRepository commentJpaRepository;
+    private final CommentJpaRepository commentJpaRepository;
 
-	@Override
-	public Comment save(Comment comment) {
-		return CommentMapper.toDomain(commentJpaRepository.save(CommentMapper.toEntity(comment)));
-	}
+    @Override
+    public Comment save(Comment comment) {
+        return CommentMapper.toDomain(commentJpaRepository.save(CommentMapper.toEntity(comment)));
+    }
 
-	@Override
-	public Optional<Comment> findById(Long commentId) {
-		return commentJpaRepository.findById(commentId).map(CommentMapper::toDomain);
-	}
+    @Override
+    public Optional<Comment> findById(Long commentId) {
+        return commentJpaRepository.findById(commentId).map(CommentMapper::toDomain);
+    }
 
-	@Override
-	public List<Comment> findByPostId(Long postId) {
-		return commentJpaRepository.findByPostId(postId).stream()
-			.map(CommentMapper::toDomain)
-			.collect(Collectors.toList());
-	}
+    @Override
+    public void delete(Comment comment) {
+        commentJpaRepository.delete(CommentMapper.toEntity(comment));
+    }
 
-	@Override
-	public void delete(Comment comment) {
-		commentJpaRepository.delete(CommentMapper.toEntity(comment));
-	}
+    @Override
+    public boolean existsByPostIdAndMemberIdAndContent(Long postId, Long memberId, String content) {
+        return commentJpaRepository.existsByPostIdAndMemberIdAndContent(
+                postId, memberId, content
+        );
+    }
 
-	@Override
-	public boolean existsByPostIdAndMemberIdAndContent(Long postId, Long memberId, String content) {
-		return commentJpaRepository.existsByPostIdAndMemberIdAndContent(
-				postId, memberId, content
-		);
-	}
-
-	@Override
-	public List<Comment> getAllComments(Long postId) {
-		return commentJpaRepository.findByPostIdOrderByParentIdAscCreatedAtAsc(postId)
-				.stream()
-				.map(CommentMapper::toDomain)
-				.collect(Collectors.toList());
-	}
+    @Override
+    public List<Comment> getAllComments(Long postId) {
+        return commentJpaRepository.findByPostIdOrderByParentIdAscCreatedAtAsc(postId)
+                .stream()
+                .map(CommentMapper::toDomain)
+                .collect(Collectors.toList());
+    }
 }
