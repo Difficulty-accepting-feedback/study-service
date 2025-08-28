@@ -1,7 +1,9 @@
 package com.grow.study_service.group.infra.persistence.repository;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.grow.study_service.group.domain.enums.Category;
 import org.springframework.stereotype.Repository;
 
 import com.grow.study_service.group.domain.model.Group;
@@ -29,5 +31,14 @@ public class GroupRepositoryImpl implements GroupRepository {
 	@Override
 	public void delete(Group group) {
 		groupJpaRepository.delete(GroupMapper.toEntity(group));
+	}
+
+	// 카테고리별 전체 그룹을 조회
+	@Override
+	public List<Group> findAllByCategory(Category category) {
+        return groupJpaRepository.findAllByCategory(category)
+				.stream()
+				.map(GroupMapper::toDomain)
+				.toList();
 	}
 }
