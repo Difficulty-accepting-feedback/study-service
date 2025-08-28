@@ -15,6 +15,7 @@ public enum ErrorCode {
     GROUP_ID_IS_EMPTY("400", "그룹 아이디는 비어있을 수 없습니다."),
     CATEGORY_IS_EMPTY("400", "카테고리는 비어있을 수 없습니다."),
     GROUP_LEADER_REQUIRED("403", "이 기능은 그룹장 권한이 있는 사용자만 사용할 수 있습니다. 그룹장 권한 요청 후 다시 시도해 주세요."),
+    GROUP_NOT_FOUND("404", "그룹을 찾을 수 없습니다." ),
 
     /**
      * 📌 2. 그룹 멤버(Group Member) 관련
@@ -70,7 +71,8 @@ public enum ErrorCode {
     INVALID_POST_ACCESS("403", "이 게시글에 접근할 권한이 없습니다. postId나 그룹 가입 상태를 확인해 주세요. "),
     COMMENT_ALREADY_EXISTS("409", "이미 동일한 댓글이 존재합니다. " ),
     COMMENT_NOT_FOUND("404", "댓글을 찾을 수 없습니다. "),
-    INVALID_COMMENT_ACCESS("403", "이 댓글에 접근할 권한이 없습니다. " ),;
+    INVALID_COMMENT_ACCESS("403", "이 댓글에 접근할 권한이 없습니다. " ),
+    ;
 
     private final String code;
     private final String message;
