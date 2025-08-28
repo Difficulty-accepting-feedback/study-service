@@ -4,14 +4,9 @@ import java.time.LocalDateTime;
 
 import com.grow.study_service.group.domain.enums.Category;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.grow.study_service.group.domain.enums.PersonalityTag;
+import com.grow.study_service.group.domain.enums.SkillTag;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -21,6 +16,7 @@ import lombok.*;
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class GroupJpaEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -34,4 +30,17 @@ public class GroupJpaEntity {
 	private String description;
 
 	private LocalDateTime createdAt;
+
+	private int amount; // 멘토링 설정 값 (다른 항목에선 0 유지)
+
+	private int viewCount; // 조회수
+
+	@Enumerated(EnumType.STRING)
+	private PersonalityTag personalityTag;
+
+	@Enumerated(EnumType.STRING)
+	private SkillTag skillTag;
+
+	@Version
+	private Long version; // 낙관적 락
 }

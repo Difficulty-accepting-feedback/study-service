@@ -29,7 +29,12 @@ public class GroupMapper {
 				entity.getName(),
 				entity.getCategory(),
 				entity.getDescription(),
-				entity.getCreatedAt()
+				entity.getCreatedAt(),
+				entity.getAmount(),
+				entity.getViewCount(),
+				entity.getPersonalityTag(),
+				entity.getSkillTag(),
+				entity.getVersion()
 		);
 	}
 
@@ -46,7 +51,12 @@ public class GroupMapper {
 				.name(group.getName())
 				.category(group.getCategory())
 				.description(group.getDescription())
-				.createdAt(group.getCreatedAt());
+				.createdAt(group.getCreatedAt())
+				.amount(group.getAmount())
+				.personalityTag(group.getPersonalityTag())
+				.viewCount(group.getViewCount())
+				.version(group.getVersion())
+				.skillTag(group.getSkillTag());
 
 		if (group.getGroupId() != null) {
 			builder.id(group.getGroupId());
