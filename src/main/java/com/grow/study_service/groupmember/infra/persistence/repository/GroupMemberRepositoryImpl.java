@@ -1,8 +1,6 @@
 package com.grow.study_service.groupmember.infra.persistence.repository;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -73,5 +71,10 @@ public class GroupMemberRepositoryImpl implements GroupMemberRepository {
 	@Override
 	public boolean existsByMemberIdAndPostGroup(Long postId, Long memberId) {
 		return groupMemberJpaRepository.existsByMemberIdAndPostGroup(postId, memberId);
+	}
+
+	@Override
+	public int findMemberCountByGroupId(Long groupId) {
+		return (int) groupMemberJpaRepository.countByGroupId(groupId);
 	}
 }

@@ -32,4 +32,5 @@ public interface GroupMemberJpaRepository
 	boolean existsByMemberIdAndPostGroup(@Param("postId") Long postId,
 										 @Param("memberId") Long memberId);
 
+    long countByGroupId(Long groupId);
 }
