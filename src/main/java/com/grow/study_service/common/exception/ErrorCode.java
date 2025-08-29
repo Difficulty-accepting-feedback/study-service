@@ -27,6 +27,7 @@ public enum ErrorCode {
     GROUP_MEMBER_ID_IS_EMPTY("400", "그룹 멤버 아이디는 비어있을 수 없습니다."),
     GROUP_MEMBER_NOT_FOUND("404", "그룹 멤버를 찾을 수 없습니다."),
     MEMBER_NOT_IN_GROUP("403", "그룹 멤버가 아닙니다. 접근 권한이 없습니다."),
+    GROUP_OR_READER_NOT_FOUND("404", "그룹 또는 그룹의 리더를 찾을 수 없습니다. " ),
 
     /**
      * 📌 3. 게시판(Board) 관련
