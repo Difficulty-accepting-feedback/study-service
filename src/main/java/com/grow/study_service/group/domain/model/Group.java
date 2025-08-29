@@ -2,6 +2,8 @@ package com.grow.study_service.group.domain.model;
 
 import com.grow.study_service.common.exception.domain.DomainException;
 import com.grow.study_service.common.exception.ErrorCode;
+import com.grow.study_service.group.domain.enums.PersonalityTag;
+import com.grow.study_service.group.domain.enums.SkillTag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -48,6 +50,30 @@ public class Group {
     private String description;
 
     /**
+     * 멘토링 시, 가격 설정 값.
+     */
+    private int amount;
+
+    /**
+     * 그룹의 조회수. (인기순으로 필터링할 때 사용)
+     */
+    private int viewCount;
+
+    /**
+     * 그룹의 성격/특성 관련 태그.
+     */
+    private PersonalityTag personalityTag;
+
+    /**
+     * 기술/스킬 관련 태그.
+     */
+    private SkillTag skillTag;
+
+    // TODO 기간 추가
+
+    private Long version; // 낙관적 락
+
+    /**
      * 새로운 그룹을 생성하는 팩토리 메서드.
      * 그룹 ID는 null로 설정되며, 데이터베이스 삽입 시 자동 생성됩니다.
      *
@@ -59,15 +85,23 @@ public class Group {
      */
     public static Group create(String name,
                                Category category,
-                               String description) {
+                               String description,
+                               PersonalityTag personalityTag,
+                               SkillTag skillTag,
+                               int amount) {
 
         verifyParameters(name, category, description);
         return new Group(
-                null,
+                null, // 자동 생성
                 category,
-                LocalDateTime.now(), // 데이터베이스에 저장될 때는 현재 시각을 사용함. (자동 생성)
+                LocalDateTime.now(), // 데이터베이스에 저장될 때는 현재 시각을 사용함.
                 description,
-                name
+                name,
+                amount,
+                0,
+                personalityTag, // null 가능
+                skillTag, // null 가능
+                null // 자동 생성
         );
     }
 
@@ -98,9 +132,19 @@ public class Group {
                            String name,
                            Category category,
                            String description,
-                           LocalDateTime createdAt) {
+                           LocalDateTime createdAt,
+                           int amount,
+                           int viewCount,
+                           PersonalityTag personalityTag,
+                           SkillTag skillTag,
+                           Long version) {
 
-        return new Group(groupId, category, createdAt, name, description);
+        return new Group(
+                groupId, category,
+                createdAt, name,
+                description, amount,
+                viewCount, personalityTag,
+                skillTag, version);
     }
 
     // ==== 업데이트 로직 ==== //
@@ -136,5 +180,11 @@ public class Group {
         if (!this.description.equals(newDescription)) {
             this.description = newDescription;
         }
+    }
+
+    public Group incrementViewCount() {
+        this.viewCount++;
+
+        return this;
     }
 }
