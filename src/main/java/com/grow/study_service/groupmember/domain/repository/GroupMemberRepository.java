@@ -12,4 +12,5 @@ public interface GroupMemberRepository {
 	boolean existsByGroupIdAndMemberId(Long groupId, Long memberId);
 	boolean existsByMemberIdAndPostGroup(Long postId, Long memberId);
     int findMemberCountByGroupId(Long groupId);
+	Optional<GroupMember> findByGroupIdAndLeader(Long groupId);
 }
