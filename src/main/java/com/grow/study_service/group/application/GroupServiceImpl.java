@@ -119,7 +119,7 @@ public class GroupServiceImpl implements GroupService {
     private GroupResponse createGroupResponse(Group group) {
         // 그룹의 리더 찾기
         GroupMember groupLeader = groupMemberRepository.findByGroupIdAndLeader(group.getGroupId())
-                .orElseThrow(() -> new ServiceException(ErrorCode.GROUP_OR_READER_NOT_FOUND));
+                .orElseThrow(() -> new ServiceException(ErrorCode.GROUP_OR_LEADER_NOT_FOUND));
 
         String memberName = memberApiService.getMemberName(groupLeader.getMemberId());
 
@@ -142,6 +142,6 @@ public class GroupServiceImpl implements GroupService {
         return groupMemberRepository.findByGroupIdAndLeader(group.getGroupId())
                 .map(GroupMember::getMemberId)
                 .map(memberApiService::getMemberName)
-                .orElseThrow(() -> new ServiceException(ErrorCode.GROUP_OR_READER_NOT_FOUND));
+                .orElseThrow(() -> new ServiceException(ErrorCode.GROUP_OR_LEADER_NOT_FOUND));
     }
 }
