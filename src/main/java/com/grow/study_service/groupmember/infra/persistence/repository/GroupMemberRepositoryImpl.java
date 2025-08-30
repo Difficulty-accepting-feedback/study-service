@@ -2,6 +2,7 @@ package com.grow.study_service.groupmember.infra.persistence.repository;
 
 import java.util.Optional;
 
+import com.grow.study_service.groupmember.domain.enums.Role;
 import org.springframework.stereotype.Repository;
 
 import com.grow.study_service.groupmember.domain.model.GroupMember;
@@ -76,5 +77,13 @@ public class GroupMemberRepositoryImpl implements GroupMemberRepository {
 	@Override
 	public int findMemberCountByGroupId(Long groupId) {
 		return (int) groupMemberJpaRepository.countByGroupId(groupId);
+	}
+
+	@Override
+	public Optional<GroupMember> findByGroupIdAndLeader(Long groupId) {
+		return groupMemberJpaRepository.findByGroupIdAndRole(groupId, Role.LEADER)
+				.stream()
+				.map(GroupMemberMapper::toDomain)
+				.findFirst();
 	}
 }
