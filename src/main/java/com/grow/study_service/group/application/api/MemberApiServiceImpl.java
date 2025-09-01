@@ -1,4 +1,4 @@
-package com.grow.study_service.group.application;
+package com.grow.study_service.group.application.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -61,5 +64,22 @@ public class MemberApiServiceImpl implements MemberApiService {
                         response -> Mono.error(new RuntimeException("API 호출 실패: " + response.statusCode())))
                 .bodyToMono(String.class)
                 .block();
+    }
+
+    /**
+     * 주어진 멤버 ID 리스트에 해당하는 멤버 이름들을 조회합니다.
+     *
+     * 이 메서드는 각 멤버 ID에 대해 {@link #getMemberName(Long)} 메서드를 호출하여
+     * 이름을 가져온 후, 리스트 형태로 반환합니다. MSA 환경에서 WebClient를 통해
+     * 멤버 서비스에 동기 HTTP 요청을 보내 실시간으로 데이터를 조회합니다.
+     *
+     * @param memberIds 조회할 멤버 ID들의 리스트 (null 또는 빈 리스트일 경우 빈 리스트 반환)
+     * @return 각 멤버 ID에 해당하는 이름들의 리스트 (순서 유지)
+     */
+    @Override
+    public List<String> fetchMemberNames(List<Long> memberIds) {
+        return memberIds.stream()
+                .map(this::getMemberName)
+                .collect(Collectors.toList());
     }
 }
