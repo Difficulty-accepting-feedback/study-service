@@ -7,8 +7,10 @@ import com.grow.study_service.group.application.dto.GroupWithLeader;
 import com.grow.study_service.group.domain.enums.Category;
 import com.grow.study_service.group.domain.model.Group;
 import com.grow.study_service.group.domain.repository.GroupRepository;
+import com.grow.study_service.group.infra.persistence.repository.query.GroupQueryRepository;
 import com.grow.study_service.group.presentation.dto.GroupDetailResponse;
 import com.grow.study_service.group.presentation.dto.GroupResponse;
+import com.grow.study_service.group.presentation.dto.GroupSimpleResponse;
 import com.grow.study_service.groupmember.domain.model.GroupMember;
 import com.grow.study_service.groupmember.domain.repository.GroupMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class GroupTransactionServiceImpl implements GroupTransactionService {
 
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final GroupQueryRepository groupQueryRepository;
 
     /**
      * 주어진 카테고리에 해당하는 모든 그룹과 각각의 그룹 리더 정보를 조회하여
@@ -151,5 +154,12 @@ public class GroupTransactionServiceImpl implements GroupTransactionService {
         log.info("[GROUP][DETAIL][END] 그룹 상세 조회 완료 groupId={} memberCount={}", groupId, memberCount);
 
         return GroupDetailResponse.of(group, memberCount, leaderName);
+    }
+
+    // 빈 리스트 반환 가능
+    @Override
+    @Transactional(readOnly = true)
+    public List<GroupSimpleResponse> getMyGroupsByCategory(Category category, Long memberId) {
+        return groupQueryRepository.findJoinedGroupsByMemberAndCategory(memberId, category);
     }
 }
