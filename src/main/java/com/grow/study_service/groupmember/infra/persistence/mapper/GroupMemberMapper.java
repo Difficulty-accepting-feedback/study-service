@@ -30,7 +30,8 @@ public class GroupMemberMapper {
 				entity.getMemberId(),
 				entity.getGroupId(),
 				entity.getRole(),
-				entity.getJoinedAt()
+				entity.getJoinedAt(),
+				entity.getVersion()
 		);
 	}
 
@@ -49,7 +50,8 @@ public class GroupMemberMapper {
 				.memberId(domain.getMemberId())
 				.groupId(domain.getGroupId())
 				.role(domain.getRole())
-				.joinedAt(domain.getJoinedAt());
+				.joinedAt(domain.getJoinedAt())
+				.version(domain.getVersion());
 
 		if (domain.getGroupId() != null) {
 			builder.id(domain.getGroupMemberId());
