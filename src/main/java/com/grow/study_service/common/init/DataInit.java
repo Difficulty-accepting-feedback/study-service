@@ -119,6 +119,10 @@ public class DataInit implements CommandLineRunner {
         groupMembers.add(GroupMember.create(41L, 21L, Role.LEADER)); // 건강 관리 코칭 리더
         groupMembers.add(GroupMember.create(42L, 21L, Role.MEMBER)); // 건강 관리 코칭 멤버
 
+        // 여러 그룹에 가입한 회원 추가
+        groupMembers.add(GroupMember.create(1L, 2L, Role.MEMBER)); // 영어 회화 모임 멤버로 가입
+        groupMembers.add(GroupMember.create(1L, 3L, Role.MEMBER)); // 데이터 사이언스 학습단 멤버로 가입
+
         // 모든 GroupMember 저장
         groupMembers.forEach(groupMemberRepository::save);
 
