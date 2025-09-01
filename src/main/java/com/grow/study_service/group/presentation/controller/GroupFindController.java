@@ -1,7 +1,7 @@
 package com.grow.study_service.group.presentation.controller;
 
 import com.grow.study_service.common.rsdata.RsData;
-import com.grow.study_service.group.application.GroupService;
+import com.grow.study_service.group.application.GroupFacadeService;
 import com.grow.study_service.group.domain.enums.Category;
 import com.grow.study_service.group.presentation.dto.GroupDetailResponse;
 import com.grow.study_service.group.presentation.dto.GroupResponse;
@@ -15,13 +15,13 @@ import java.util.List;
 @RequestMapping("/api/v1/groups")
 public class GroupFindController {
 
-    private final GroupService groupService;
+    private final GroupFacadeService groupFacadeService;
 
     // 전체 그룹 조회 (카테고리 별 조회 가능)
-    @GetMapping("/{category}")
-    public RsData<List<GroupResponse>> getGroups(@PathVariable("category") Category category) {
+    @GetMapping()
+    public RsData<List<GroupResponse>> getGroups(@RequestParam("category") Category category) {
 
-        List<GroupResponse> responses = groupService.getAllGroupsByCategory(category);
+        List<GroupResponse> responses = groupFacadeService.getAllGroupsByCategory(category);
 
         return new RsData<>(
                 "200",
@@ -31,10 +31,10 @@ public class GroupFindController {
     }
 
     // 특정 그룹 조회 (ID)
-    @GetMapping("/{category}/{groupId}")
-    public RsData<GroupDetailResponse> getSingleGroup(@PathVariable("category") Category category,
-                                                      @PathVariable("groupId") Long groupId) {
-        GroupDetailResponse response = groupService.getGroup(groupId);
+    @GetMapping("/{groupId}")
+    public RsData<GroupDetailResponse> getSingleGroup(@PathVariable("groupId") Long groupId) {
+
+        GroupDetailResponse response = groupFacadeService.getGroupByCategory(groupId);
 
         return new RsData<>(
                 "200",

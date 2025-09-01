@@ -13,6 +13,7 @@ public class GroupDetailResponse {
 
     private Long groupId;
     private String groupName;
+    private String leaderNickname;
     private Category category;
     private String description;
     private int amount;
@@ -21,10 +22,11 @@ public class GroupDetailResponse {
     private PersonalityTag personalityTag;
     private SkillTag skillTag;
 
-    public static GroupDetailResponse of(Group group, int memberCount) {
+    public static GroupDetailResponse of(Group group, int memberCount, String leaderNickname) {
         return GroupDetailResponse.builder()
                 .groupId(group.getGroupId())
                 .groupName(group.getName())
+                .leaderNickname(leaderNickname)
                 .category(group.getCategory())
                 .description(group.getDescription())
                 .amount(group.getAmount())

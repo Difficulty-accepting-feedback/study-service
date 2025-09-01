@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-// TODO 그룹장의 이름을 같이 넘길 것
 @Getter
 @Builder
 @AllArgsConstructor
@@ -16,16 +15,18 @@ public class GroupResponse {
 
     private Long groupId;
     private String groupName;
+    private String leaderNickname;
     private Category category;
     private String description;
     private int amount;
     private PersonalityTag personalityTag;
     private SkillTag skillTag;
 
-    public static GroupResponse of(Group group) {
+    public static GroupResponse of(Group group, String leaderNickname) {
         return GroupResponse.builder()
                 .groupId(group.getGroupId())
                 .groupName(group.getName())
+                .leaderNickname(leaderNickname)
                 .category(group.getCategory())
                 .amount(group.getAmount())
                 .description(group.getDescription())
