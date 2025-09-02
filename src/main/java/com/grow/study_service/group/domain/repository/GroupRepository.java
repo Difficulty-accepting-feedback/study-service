@@ -11,4 +11,5 @@ public interface GroupRepository {
 	Optional<Group> findById(Long groupId);
 	void delete(Group group);
     List<Group> findAllByCategory(Category category);
+	String findGroupNameById(Long groupId);
 }

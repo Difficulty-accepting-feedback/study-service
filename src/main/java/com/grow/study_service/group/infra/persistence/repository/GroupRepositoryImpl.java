@@ -41,4 +41,16 @@ public class GroupRepositoryImpl implements GroupRepository {
 				.map(GroupMapper::toDomain)
 				.toList();
 	}
+
+	/**
+	 * 주어진 그룹 ID로 그룹 이름을 조회합니다.
+	 * 그룹이 존재하지 않으면 null을 반환합니다.
+	 *
+	 * @param groupId 조회할 그룹 ID
+	 * @return 그룹 이름 (String), 없으면 null
+	 */
+	@Override
+	public String findGroupNameById(Long groupId) {
+		return groupJpaRepository.findGroupNameById(groupId);
+	}
 }
