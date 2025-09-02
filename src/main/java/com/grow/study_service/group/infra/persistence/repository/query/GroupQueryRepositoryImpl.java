@@ -3,6 +3,7 @@ package com.grow.study_service.group.infra.persistence.repository.query;
 import com.grow.study_service.group.domain.enums.Category;
 import com.grow.study_service.group.infra.persistence.entity.QGroupJpaEntity;
 import com.grow.study_service.group.presentation.dto.GroupSimpleResponse;
+import com.grow.study_service.groupmember.domain.enums.Role;
 import com.grow.study_service.groupmember.infra.persistence.entity.QGroupMemberJpaEntity;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+
+import static com.grow.study_service.groupmember.infra.persistence.entity.QGroupMemberJpaEntity.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,7 +31,7 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
      * @return GroupSimpleResponse 객체 리스트 (그룹 ID, 이름, 역할, 가입일 포함). 빈 리스트일 수 있음
      */
     public List<GroupSimpleResponse> findJoinedGroupsByMemberAndCategory(Long memberId, Category category) {
-        QGroupMemberJpaEntity groupMember = QGroupMemberJpaEntity.groupMemberJpaEntity;
+        QGroupMemberJpaEntity groupMember = groupMemberJpaEntity;
         QGroupJpaEntity group = QGroupJpaEntity.groupJpaEntity;
 
         List<Tuple> tupleList = factory.select(group.id, group.name, groupMember.role, groupMember.joinedAt)
@@ -50,5 +53,24 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                         tuple.get(groupMember.joinedAt)
                 ))
                 .toList();
+    }
+
+    /**
+     * 주어진 회원 ID를 기반으로, 해당 회원이 그룹장(LEADER)인 그룹의 ID 목록을 조회합니다.
+     * GroupMemberJpaEntity에서 memberId와 Role.LEADER 조건으로 필터링하며, 결과를 Long 타입의 리스트로 반환합니다.
+     * 결과가 없을 경우 빈 리스트를 반환합니다.
+     *
+     * @param memberId 조회할 회원의 ID (필수, null 불가)
+     * @return 그룹 ID 리스트 (빈 리스트일 수 있음)
+     */
+    @Override
+    public List<Long> findGroupIdsByLeaderId(Long memberId) {
+        QGroupMemberJpaEntity groupMember = groupMemberJpaEntity;
+
+        return factory
+                .select(groupMember.groupId)
+                .from(groupMember)
+                .where(groupMember.memberId.eq(memberId), groupMember.role.eq(Role.LEADER))
+                .fetch();
     }
 }
