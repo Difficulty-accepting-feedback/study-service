@@ -1,4 +1,4 @@
-package com.grow.study_service.group.presentation.dto;
+package com.grow.study_service.group.presentation.dto.join;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
