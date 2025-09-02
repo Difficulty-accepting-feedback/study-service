@@ -3,6 +3,7 @@ package com.grow.study_service.group.application;
 import com.grow.study_service.group.application.api.MemberApiService;
 import com.grow.study_service.group.application.dto.GroupDetailPrep;
 import com.grow.study_service.group.application.dto.GroupWithLeader;
+import com.grow.study_service.group.application.join.GroupJoinService;
 import com.grow.study_service.group.domain.enums.Category;
 import com.grow.study_service.group.presentation.dto.GroupDetailResponse;
 import com.grow.study_service.group.presentation.dto.GroupResponse;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.grow.study_service.group.application.api.MemberApiServiceImpl.*;
 
 /**
  * GroupMainService는 파사드 패턴을 적용하여
@@ -27,6 +30,7 @@ public class GroupFacadeService {
 
     private final GroupTransactionService groupTransactionService; // 트랜잭션 처리 담당
     private final MemberApiService memberApiService; // 외부 API 호출 담당
+    private final GroupJoinService groupJoinService;
 
     public List<GroupResponse> getAllGroupsByCategory(Category category) {
         // 트랜잭션 내에서 그룹 + 리더의 데이터를 가져온 후,
@@ -51,5 +55,13 @@ public class GroupFacadeService {
         String memberName = memberApiService.getMemberName(detailPrep.getLeaderId());
         // 그룹 상세 정보 생성 (DTO 생성)
         return groupTransactionService.buildGroupDetailResponse(detailPrep, memberName, groupId);
+    }
+
+    // 가입 요청 조회 + 멤버 정보 api 조회
+    public List<MemberInfo> getJoinMemberInfo(Long groupId) {
+        List<Long> allMemberIds = groupJoinService.prepareFindJoinRequest(groupId);
+
+        // 동기적으로 결과 받기 → 결과를 바로 이용해야 함
+        return memberApiService.getNicknameAndScore(allMemberIds).block();
     }
 }
