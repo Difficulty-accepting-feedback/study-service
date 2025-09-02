@@ -47,6 +47,8 @@ public class GroupMember {
 	 */
 	private final LocalDateTime joinedAt;
 
+    private Long version;
+
     /**
      * 새로운 그룹 멤버를 생성하는 팩토리 메서드.
      * 그룹 멤버 ID는 null로 설정되며, 데이터베이스 삽입 시 자동 생성됩니다.
@@ -68,7 +70,8 @@ public class GroupMember {
                 memberId,
                 groupId,
                 role,
-                LocalDateTime.now() // 데이터베이스에 저장될 때는 현재 시각을 사용함. (자동 생성)
+                LocalDateTime.now(), // 데이터베이스에 저장될 때는 현재 시각을 사용함. (자동 생성)
+                null // 버전 자동 생성
         );
     }
 
@@ -88,8 +91,9 @@ public class GroupMember {
                                  Long memberId,
                                  Long groupId,
                                  Role role,
-                                 LocalDateTime joinedAt
-    ) {
+                                 LocalDateTime joinedAt,
+                                 Long version) {
+
         verifyParameters(memberId, groupId, role);
         verifyIdAndJoinedAt(groupMemberId, joinedAt);
 
@@ -98,7 +102,8 @@ public class GroupMember {
                 memberId,
                 groupId,
                 role,
-                joinedAt
+                joinedAt,
+                version
         );
     }
 

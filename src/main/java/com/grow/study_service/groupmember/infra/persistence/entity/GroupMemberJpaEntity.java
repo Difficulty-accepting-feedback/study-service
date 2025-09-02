@@ -4,13 +4,7 @@ import java.time.LocalDateTime;
 
 import com.grow.study_service.groupmember.domain.enums.Role;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,4 +30,7 @@ public class GroupMemberJpaEntity {
 	private Role role;
 
 	private LocalDateTime joinedAt;
+
+	@Version
+	private Long version;
 }
