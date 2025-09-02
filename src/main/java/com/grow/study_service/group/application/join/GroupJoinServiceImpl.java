@@ -2,7 +2,10 @@ package com.grow.study_service.group.application.join;
 
 import com.grow.study_service.common.exception.ErrorCode;
 import com.grow.study_service.common.exception.service.ServiceException;
-import com.grow.study_service.group.presentation.dto.JoinRequest;
+import com.grow.study_service.group.domain.repository.GroupRepository;
+import com.grow.study_service.group.infra.persistence.repository.query.GroupQueryRepository;
+import com.grow.study_service.group.presentation.dto.join.JoinInfoResponse;
+import com.grow.study_service.group.presentation.dto.join.JoinRequest;
 import com.grow.study_service.groupmember.domain.enums.Role;
 import com.grow.study_service.groupmember.domain.model.GroupMember;
 import com.grow.study_service.groupmember.domain.repository.GroupMemberRepository;
@@ -12,7 +15,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -20,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 public class GroupJoinServiceImpl implements GroupJoinService {
 
     private final GroupMemberRepository groupMemberRepository;
+    private final GroupQueryRepository groupQueryRepository;
+    private final GroupRepository groupRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
     /**
@@ -71,8 +78,8 @@ public class GroupJoinServiceImpl implements GroupJoinService {
             throw new ServiceException(ErrorCode.GROUP_ALREADY_JOINED);
         }
 
-        // 그룹장에게 요청 전송 (redis 사용, 중복 요청을 거르기 위해서 set 구조 사용)
-        String redisKey = "group:" + request.getGroupId() + ":join-joinRequests"; // 키 생성
+        // 그룹장에게 요청 전송 (redis 사용, 중복 요청을 거르기 위해서 set 구조 사용) - 같은 키값 사용 가능, value 만 다르면 됨
+        String redisKey = getRedisKey(request.getGroupId()); // 키 생성
 
         // Sets에 추가하고 추가된 수 확인 (중복 요청 방지) - 값이 추가되면 1, 이미 존재하면 0 반환
         Long added = redisTemplate.opsForSet().add(redisKey, String.valueOf(memberId));
@@ -85,5 +92,56 @@ public class GroupJoinServiceImpl implements GroupJoinService {
         redisTemplate.expire(redisKey, expireTime, TimeUnit.SECONDS);
 
         log.info("[GROUP][JOIN][END] memberId={} groupId={} - 그룹 가입 요청 전송 완료", memberId, request.getGroupId());
+    }
+
+    /**
+     * 주어진 회원 ID를 기반으로, 해당 회원이 그룹장(리더)인 그룹의 ID 리스트를 조회합니다.
+     * 조회된 그룹 ID를 바탕으로 각 그룹의 이름을 추가하여 JoinInfoResponse 객체 리스트로 변환 후 반환합니다.
+     * 그룹이 존재하지 않거나 이름 조회에 실패할 경우, 빈 리스트를 반환합니다.
+     *
+     * @param memberId 조회할 회원의 ID (필수, null 불가)
+     * @return 그룹 ID와 그룹 이름을 포함하는 JoinInfoResponse 리스트 (빈 리스트일 수 있음)
+     */
+    @Override
+    public List<JoinInfoResponse> findGroupIdsByLeaderId(Long memberId) {
+        log.info("[GROUP][JOIN][START] memberId={} - 그룹 리스트 조회 시작", memberId);
+        return groupQueryRepository.findGroupIdsByLeaderId(memberId).stream()
+                .map(id -> {
+                    String groupName = groupRepository.findGroupNameById(id);
+                    return new JoinInfoResponse(id, groupName); // 그룹 정보 반환
+                })
+                .toList();
+    }
+
+    /**
+     * 주어진 그룹 ID를 기반으로 Redis에서 해당 그룹의 가입 요청 멤버 ID 리스트를 조회합니다.
+     * Redis Set 자료 구조를 사용하며, 키가 존재하지 않거나 멤버가 없을 경우 빈 리스트를 반환합니다.
+     *
+     * @param groupId 조회할 그룹의 ID (필수, null 불가)
+     * @return 가입 요청 멤버 ID 리스트 (Long 타입, 빈 리스트일 수 있음)
+     */
+    @Override
+    public List<Long> prepareFindJoinRequest(Long groupId) {
+        // TODO 그룹장 권한 확인
+        // Redis에서 해당 그룹의 가입 요청 멤버 ID 집합 조회
+        String redisKey = getRedisKey(groupId);
+
+        if (!redisTemplate.hasKey(redisKey)) {
+            return List.of();  // 키가 없으면 빈 리스트 반환
+        }
+
+        Set<String> members = redisTemplate.opsForSet().members(redisKey);
+        if (members == null || members.isEmpty()) {
+            return List.of();  // 멤버가 없으면 빈 리스트 반환
+        }
+
+        // String 멤버 ID를 Long 리스트로 변환하여 반환
+        return members.stream()
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+    }
+
+    private String getRedisKey(Long groupId) {
+        return "group:" + groupId + ":send-joinRequests";
     }
 }

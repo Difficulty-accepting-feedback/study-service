@@ -8,4 +8,6 @@ import java.util.List;
 public interface GroupQueryRepository {
 
     List<GroupSimpleResponse> findJoinedGroupsByMemberAndCategory(Long memberId, Category category);
+
+    List<Long> findGroupIdsByLeaderId(Long memberId);
 }

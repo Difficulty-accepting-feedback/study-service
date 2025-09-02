@@ -1,8 +1,13 @@
 package com.grow.study_service.group.application.join;
 
-import com.grow.study_service.group.presentation.dto.JoinRequest;
+import com.grow.study_service.group.presentation.dto.join.JoinInfoResponse;
+import com.grow.study_service.group.presentation.dto.join.JoinRequest;
+
+import java.util.List;
 
 public interface GroupJoinService {
     void joinGroup(Long memberId, Long groupId);
     void sendJoinRequest(JoinRequest request, Long memberId);
+    List<JoinInfoResponse> findGroupIdsByLeaderId(Long memberId);
+    List<Long> prepareFindJoinRequest(Long groupId);
 }

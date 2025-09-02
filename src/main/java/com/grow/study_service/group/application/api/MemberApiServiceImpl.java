@@ -1,11 +1,15 @@
 package com.grow.study_service.group.application.api;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +21,9 @@ public class MemberApiServiceImpl implements MemberApiService {
 
     @Value("${member.name.path}")
     private String memberNamePath;
+
+    @Value("${member.info.path}")
+    private String memberInfoPath;
 
     private final WebClient webClient;
 
@@ -81,5 +88,44 @@ public class MemberApiServiceImpl implements MemberApiService {
         return memberIds.stream()
                 .map(this::getMemberName)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 주어진 memberId 리스트를 기반으로 외부 서버에서 닉네임과 점수를 비동기 병렬 요청으로 조회합니다.
+     * WebClient를 활용해 여러 요청을 동시에 처리하여 성능을 최적화합니다.
+     * 에러 발생 시 로그를 남기고 빈 MemberInfo를 반환하며, 전체 결과를 Mono<List<MemberInfo>>로 제공합니다.
+     *
+     * @param memberIds 조회할 회원 ID 리스트 (필수, 빈 리스트 시 빈 결과 반환)
+     * @return Mono<List<MemberInfo>> - 닉네임과 점수 리스트 (비동기 처리 결과)
+     */
+    @Override
+    public Mono<List<MemberInfo>> getNicknameAndScore(List<Long> memberIds) {
+        if (memberIds.isEmpty()) {
+            return Mono.just(List.of()); // 입력 리스트가 비어 있으면, 불필요한 작업을 피하고 바로 빈 리스트를 Mono로 감싸 반환
+        }
+
+        // 전체 흐름: ID 리스트를 Flux로 변환 → 병렬로 API 호출 → 결과 모아서 리스트 반환
+        return Flux.fromIterable(memberIds) // 리스트(memberIds)를 Flux(스트림)로 변환 Flux: "여러" 아이템을 순차적으로 처리
+                .parallel() // Flux를 병렬 모드로 전환 → 여러 스레드에서 동시에 작업을 나눠 처리
+                .runOn(Schedulers.parallel()) // 병렬 처리를 위한 스케줄러를 지정 Schedulers.parallel(): CPU 코어 수에 맞는 스레드 풀을 사용해 병렬 작업을 실행
+                .flatMap(memberId -> webClient.get() // 입력을 받아 새로운 Mono/Flux를 반환하고, 이를 평평하게(flatten) 합침
+                        .uri(memberInfoPath, memberId)
+                        .retrieve() // API 응답을 처리하기 시작
+                        .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                                response -> Mono.error(new RuntimeException("API 호출 실패: " + response.statusCode())))
+                        .bodyToMono(MemberInfo.class) // 응답 본문을 MemberInfo 객체로 변환
+                        .onErrorResume(e -> { // 에러가 발생해도 스트림이 중단되지 않도록 처리
+                            log.error("[Member Info API error] API 호출 실패: {}", e.getMessage());
+                            return Mono.empty(); // 에러 발생 시 빈 MemberInfo 반환
+                        }))
+                .sequential() // 병렬 처리 결과를 순차 Flux 로 합침 (병렬 처리 후 결과를 순서대로 모으는 데 필요)
+                .collectList(); // 결과를 리스트로 반환
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class MemberInfo {
+        private String nickname;
+        private double score;
     }
 }
