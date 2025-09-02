@@ -65,7 +65,7 @@ public class DeleteCommentTest {
     @BeforeEach
     void outerSetUp() {
         /* ① 그룹 도메인 객체 생성 및 저장 */
-        group = groupRepository.save(Group.create("스터디 그룹", Category.STUDY, "도메인 테스트용 그룹"));
+        group = groupRepository.save(Group.create("스터디 그룹", Category.STUDY, "도메인 테스트용 그룹", null, null, 0));
 
         /* ② 게시판 도메인 객체 생성 및 저장 */
         board = Board.create(
