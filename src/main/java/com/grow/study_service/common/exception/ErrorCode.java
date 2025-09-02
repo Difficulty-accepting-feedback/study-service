@@ -18,6 +18,7 @@ public enum ErrorCode {
     GROUP_NOT_FOUND("404", "그룹을 찾을 수 없습니다." ),
     GROUP_ALREADY_JOINED("409", "이미 가입된 그룹입니다."),
     JOIN_REQUEST_ALREADY_SENT("409", "이미 가입 요청을 보냈습니다." ),
+    NO_PERMISSION_TO_ACCEPT_REQUEST("403", "요청을 수락할 권한이 없습니다."),
 
     /**
      * 📌 2. 그룹 멤버(Group Member) 관련
@@ -30,6 +31,7 @@ public enum ErrorCode {
     GROUP_MEMBER_NOT_FOUND("404", "그룹 멤버를 찾을 수 없습니다."),
     MEMBER_NOT_IN_GROUP("403", "그룹 멤버가 아닙니다. 접근 권한이 없습니다."),
     GROUP_OR_LEADER_NOT_FOUND("404", "그룹 또는 그룹의 리더를 찾을 수 없습니다. " ),
+    ALREADY_ACCEPTED_REQUEST("409", "이미 가입 요청을 수락했습니다."),
 
 
     /**
@@ -75,8 +77,7 @@ public enum ErrorCode {
     INVALID_POST_ACCESS("403", "이 게시글에 접근할 권한이 없습니다. postId나 그룹 가입 상태를 확인해 주세요. "),
     COMMENT_ALREADY_EXISTS("409", "이미 동일한 댓글이 존재합니다." ),
     COMMENT_NOT_FOUND("404", "댓글을 찾을 수 없습니다."),
-    INVALID_COMMENT_ACCESS("403", "이 댓글에 접근할 권한이 없습니다." ),
-    ;
+    INVALID_COMMENT_ACCESS("403", "이 댓글에 접근할 권한이 없습니다." ),;
 
     private final String code;
     private final String message;
