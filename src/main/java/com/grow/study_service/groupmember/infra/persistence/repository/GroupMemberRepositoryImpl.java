@@ -86,4 +86,14 @@ public class GroupMemberRepositoryImpl implements GroupMemberRepository {
 				.map(GroupMemberMapper::toDomain)
 				.findFirst();
 	}
+
+	@Override
+	public boolean isLeader(Long groupId, Long memberId) {
+		return groupMemberJpaRepository.isLeader(groupId, Role.LEADER, memberId);
+	}
+
+	@Override
+	public boolean existsByMemberIdAndGroupId(Long memberId, Long groupId) {
+		return groupMemberJpaRepository.existsByMemberIdAndGroupId(memberId, groupId);
+	}
 }

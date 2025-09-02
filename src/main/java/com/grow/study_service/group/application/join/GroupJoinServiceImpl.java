@@ -4,6 +4,7 @@ import com.grow.study_service.common.exception.ErrorCode;
 import com.grow.study_service.common.exception.service.ServiceException;
 import com.grow.study_service.group.domain.repository.GroupRepository;
 import com.grow.study_service.group.infra.persistence.repository.query.GroupQueryRepository;
+import com.grow.study_service.group.presentation.dto.join.JoinConfirmRequest;
 import com.grow.study_service.group.presentation.dto.join.JoinInfoResponse;
 import com.grow.study_service.group.presentation.dto.join.JoinRequest;
 import com.grow.study_service.groupmember.domain.enums.Role;
@@ -31,12 +32,12 @@ public class GroupJoinServiceImpl implements GroupJoinService {
 
     /**
      * 지정된 멤버를 지정된 그룹에 가입시킵니다.
-     *
+     * <p>
      * 이 메서드는 먼저 해당 멤버가 이미 그룹에 가입되어 있는지 확인합니다. 이미 가입된 경우 {@link ServiceException}을 발생시킵니다.
      * 이후 결제 서비스로 결제 요청을 전송해야 하며 (현재 TODO로 표시됨), 성공 시 그룹 멤버를 저장합니다.
      *
      * @param memberId 가입할 멤버의 ID
-     * @param groupId 가입할 그룹의 ID
+     * @param groupId  가입할 그룹의 ID
      * @throws ServiceException 그룹에 이미 가입된 경우 ({@link ErrorCode#GROUP_ALREADY_JOINED})
      */
     @Override
@@ -59,12 +60,12 @@ public class GroupJoinServiceImpl implements GroupJoinService {
 
     /**
      * 지정된 멤버가 그룹 가입 요청을 전송합니다.
-     *
+     * <p>
      * 이 메서드는 먼저 해당 멤버가 이미 그룹에 가입되어 있는지 확인합니다. 이미 가입된 경우 {@link ServiceException}을 발생시킵니다.
      * 이후 Redis Set을 사용하여 중복 요청을 방지합니다. 이미 요청이 존재하면 예외를 발생시키고, 새로운 요청인 경우 Set에 추가한 후 7일 만료 시간을 설정합니다.
      * 요청 처리 전후에 로그를 기록합니다.
      *
-     * @param request 그룹 가입 요청 객체 (groupId 포함)
+     * @param request  그룹 가입 요청 객체 (groupId 포함)
      * @param memberId 요청을 보내는 멤버의 ID
      * @throws ServiceException 그룹에 이미 가입된 경우 ({@link ErrorCode#GROUP_ALREADY_JOINED}) 또는 이미 가입 요청이 전송된 경우 ({@link ErrorCode#JOIN_REQUEST_ALREADY_SENT})
      */
@@ -139,6 +140,62 @@ public class GroupJoinServiceImpl implements GroupJoinService {
         return members.stream()
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 그룹 가입 요청을 수락합니다.
+     * 그룹 리더 권한을 확인한 후, 대상 멤버가 이미 그룹에 가입되어 있는지 검사합니다.
+     * 이미 가입된 경우 예외를 발생시키고, 그렇지 않으면 새로운 그룹 멤버를 등록합니다.
+     * 등록 후 Kafka 이벤트를 통해 상대방에게 수락 알림을 전송합니다. (TODO 구현 예정)
+     *
+     * @param memberId 현재 사용자의 멤버 ID (권한 확인용)
+     * @param request 가입 수락 요청 정보 (그룹 ID와 대상 멤버 ID 포함)
+     * @throws ServiceException 그룹 리더가 아닌 경우 (NO_PERMISSION_TO_ACCEPT_REQUEST),
+     *                          이미 가입된 경우 (ALREADY_ACCEPTED_REQUEST)
+     */
+    @Override
+    @Transactional
+    public void acceptJoinRequest(Long memberId, JoinConfirmRequest request) {
+        verifyGroupLeaderPermission(memberId, request);
+
+        // 이미 수락한 요청인지 확인
+        if (groupMemberRepository.existsByMemberIdAndGroupId(request.getMemberId(), request.getGroupId())) {
+            throw new ServiceException(ErrorCode.ALREADY_ACCEPTED_REQUEST);
+        }
+
+        // groupMember 에 등록
+        groupMemberRepository.save(
+                GroupMember.create(
+                        request.getMemberId(),
+                        request.getGroupId(),
+                        Role.MEMBER)
+        );
+
+        // TODO 상대방에게 수락 알림 전송 (kafka 이벤트 트리븐 아키텍쳐 이용)
+    }
+
+    /**
+     * 그룹 가입 요청을 거절합니다.
+     * 그룹 리더 권한을 확인한 후, 대상 멤버를 등록하지 않습니다.
+     * 거절 후 Kafka 이벤트를 통해 상대방에게 거절 알림을 전송합니다. (TODO 구현 예정)
+     *
+     * @param memberId 현재 사용자의 멤버 ID (권한 확인용)
+     * @param request 가입 거절 요청 정보 (그룹 ID와 대상 멤버 ID 포함)
+     * @throws ServiceException 그룹 리더가 아닌 경우 (NO_PERMISSION_TO_ACCEPT_REQUEST)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public void rejectJoinRequest(Long memberId, JoinConfirmRequest request) {
+        verifyGroupLeaderPermission(memberId, request);
+
+        // 등록하지 않음, TODO 상대방에게 거절 알림 전송
+    }
+
+    private void verifyGroupLeaderPermission(Long memberId, JoinConfirmRequest request) {
+        // 권한이 있는지 확인 - 리더만 요청을 수락 / 거절할 수 있다
+        if (!groupMemberRepository.isLeader(request.getGroupId(), memberId)) {
+            throw new ServiceException(ErrorCode.NO_PERMISSION_TO_ACCEPT_REQUEST);
+        }
     }
 
     private String getRedisKey(Long groupId) {

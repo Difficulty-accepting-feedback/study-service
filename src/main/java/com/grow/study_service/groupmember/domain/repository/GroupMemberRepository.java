@@ -3,6 +3,7 @@ package com.grow.study_service.groupmember.domain.repository;
 import java.util.Optional;
 
 import com.grow.study_service.groupmember.domain.model.GroupMember;
+import jakarta.validation.constraints.NotNull;
 
 public interface GroupMemberRepository {
 	GroupMember save(GroupMember member);
@@ -13,4 +14,6 @@ public interface GroupMemberRepository {
 	boolean existsByMemberIdAndPostGroup(Long postId, Long memberId);
     int findMemberCountByGroupId(Long groupId);
 	Optional<GroupMember> findByGroupIdAndLeader(Long groupId);
+	boolean isLeader(Long groupId, Long memberId);
+	boolean existsByMemberIdAndGroupId(Long memberId, Long groupId);
 }

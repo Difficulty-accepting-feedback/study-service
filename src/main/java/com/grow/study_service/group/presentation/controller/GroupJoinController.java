@@ -4,6 +4,7 @@ import com.grow.study_service.common.rsdata.RsData;
 import com.grow.study_service.group.application.GroupFacadeService;
 import com.grow.study_service.group.application.api.MemberApiServiceImpl.MemberInfo;
 import com.grow.study_service.group.application.join.GroupJoinService;
+import com.grow.study_service.group.presentation.dto.join.JoinConfirmRequest;
 import com.grow.study_service.group.presentation.dto.join.JoinInfoResponse;
 import com.grow.study_service.group.presentation.dto.join.JoinRequest;
 import lombok.RequiredArgsConstructor;
@@ -62,8 +63,7 @@ public class GroupJoinController {
 
     // 그룹별 가입 요청 확인 API (ID 기반, 그룹장 전용)
     @GetMapping("/check/join-request/{groupId}")
-    public RsData<List<MemberInfo>> checkJoinRequest(
-            @PathVariable("groupId") Long groupId) {
+    public RsData<List<MemberInfo>> checkJoinRequest(@PathVariable("groupId") Long groupId) {
 
         List<MemberInfo> responses = groupFacadeService.getJoinMemberInfo(groupId);
 
@@ -73,6 +73,28 @@ public class GroupJoinController {
     }
 
     // 가입 요청 수락 API
+    @PostMapping("/accept-request")
+    public RsData<Void> acceptJoinRequest(@RequestHeader("X-Authorization-Id") Long memberId,
+                                          @RequestBody JoinConfirmRequest request) {
+
+        groupJoinService.acceptJoinRequest(memberId, request);
+
+        return new RsData<>(
+                "200",
+                "가입 요청 수락 완료"
+        );
+    }
 
     // 가입 요청 거절 API
+    @PostMapping("/reject-request")
+    public RsData<Void> rejectJoinRequest(@RequestHeader("X-Authorization-Id") Long memberId,
+                                          @RequestBody JoinConfirmRequest request) {
+
+        groupJoinService.rejectJoinRequest(memberId, request);
+
+        return new RsData<>(
+                "200",
+                "가입 요청 거절 완료"
+        );
+    }
 }
