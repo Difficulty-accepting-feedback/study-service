@@ -16,6 +16,8 @@ import com.grow.study_service.post.domain.repository.PostRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -30,9 +32,14 @@ public class DataInit implements CommandLineRunner {
     private final GroupMemberRepository groupMemberRepository;
     private final PostRepository postRepository;
     private final BoardRepository boardRepository;
+    private final RedisConnectionFactory redisConnectionFactory;
 
     @Override
     public void run(String... args) throws Exception {
+        // redis 초기화 로직 실행
+        redisConnectionFactory.getConnection().serverCommands().flushAll();
+        log.debug("redis flush all.");
+
         List<Group> groups = new ArrayList<>();
 
         // ------- 그룹 생성 ------- //
