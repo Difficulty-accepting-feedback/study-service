@@ -2,6 +2,9 @@ package com.grow.study_service.group.application.join;
 
 import com.grow.study_service.common.exception.ErrorCode;
 import com.grow.study_service.common.exception.service.ServiceException;
+import com.grow.study_service.common.util.JsonUtils;
+import com.grow.study_service.group.application.event.GroupJoinRequestSentEvent;
+import com.grow.study_service.group.application.event.NotificationType;
 import com.grow.study_service.group.domain.repository.GroupRepository;
 import com.grow.study_service.group.infra.persistence.repository.query.GroupQueryRepository;
 import com.grow.study_service.group.presentation.dto.join.JoinConfirmRequest;
@@ -13,6 +16,7 @@ import com.grow.study_service.groupmember.domain.repository.GroupMemberRepositor
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +32,9 @@ public class GroupJoinServiceImpl implements GroupJoinService {
     private final GroupMemberRepository groupMemberRepository;
     private final GroupQueryRepository groupQueryRepository;
     private final GroupRepository groupRepository;
+
     private final RedisTemplate<String, String> redisTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     /**
      * 지정된 멤버를 지정된 그룹에 가입시킵니다.
@@ -92,7 +98,20 @@ public class GroupJoinServiceImpl implements GroupJoinService {
         long expireTime = 7L * 24 * 60 * 60; // 7일 후에 초기화
         redisTemplate.expire(redisKey, expireTime, TimeUnit.SECONDS);
 
+        String groupName = groupRepository.findGroupNameById(request.getGroupId());
+
+        // 그룹장에게 새로운 가입 신청이 왔다는 알림을 전송
+        publishGroupJoinEvent(createRequestSentEvent(request, groupName));
+
         log.info("[GROUP][JOIN][END] memberId={} groupId={} - 그룹 가입 요청 전송 완료", memberId, request.getGroupId());
+    }
+
+    private GroupJoinRequestSentEvent createRequestSentEvent(JoinRequest request, String groupName) {
+        return new GroupJoinRequestSentEvent(
+                request.getLeaderId(),
+                groupName + "에 새로운 가입 신청이 왔습니다. 어서 확인해 보세요!",
+                NotificationType.GROUP_JOIN_REQUEST
+        );
     }
 
     /**
@@ -156,12 +175,15 @@ public class GroupJoinServiceImpl implements GroupJoinService {
     @Override
     @Transactional
     public void acceptJoinRequest(Long memberId, JoinConfirmRequest request) {
+        // memberId = 그룹장 아이디, request.getMemberId = 대상 멤버 아이디
         verifyGroupLeaderPermission(memberId, request);
 
         // 이미 수락한 요청인지 확인
         if (groupMemberRepository.existsByMemberIdAndGroupId(request.getMemberId(), request.getGroupId())) {
             throw new ServiceException(ErrorCode.ALREADY_ACCEPTED_REQUEST);
         }
+
+        String groupName = groupRepository.findGroupNameById(request.getGroupId());
 
         // groupMember 에 등록
         groupMemberRepository.save(
@@ -171,7 +193,19 @@ public class GroupJoinServiceImpl implements GroupJoinService {
                         Role.MEMBER)
         );
 
-        // TODO 상대방에게 수락 알림 전송 (kafka 이벤트 트리븐 아키텍쳐 이용)
+        // redis 에서 요청 삭제하기 (승인 후 거절이 되지 않도록)
+        removeJoinRequestFromRedis(request.getGroupId(), request.getMemberId());
+
+        // 그룹에 가입 요청을 보낸 유저에게 수락 알림 전송
+        publishGroupJoinEvent(createRequestApprovalEvent(request.getMemberId(), groupName));
+    }
+
+    private GroupJoinRequestSentEvent createRequestApprovalEvent(Long memberId, String groupName) {
+        return new GroupJoinRequestSentEvent(
+                memberId,
+                groupName + "에서 신청을 수락했습니다. 어서 확인해 보세요!",
+                NotificationType.GROUP_JOIN_APPROVAL
+        );
     }
 
     /**
@@ -188,7 +222,59 @@ public class GroupJoinServiceImpl implements GroupJoinService {
     public void rejectJoinRequest(Long memberId, JoinConfirmRequest request) {
         verifyGroupLeaderPermission(memberId, request);
 
-        // 등록하지 않음, TODO 상대방에게 거절 알림 전송
+        String groupName = groupRepository.findGroupNameById(request.getGroupId());
+
+        // redis 에서 요청 삭제하기 (거절 후 승인이 되지 않도록)
+        removeJoinRequestFromRedis(request.getGroupId(), request.getMemberId());
+
+        // 등록하지 않음, 그룹에 가입 요청을 보낸 유저에게 거절 알림 전송
+        publishGroupJoinEvent(createRequestRejectionEvent(request.getMemberId(), groupName));
+    }
+
+    private GroupJoinRequestSentEvent createRequestRejectionEvent(Long memberId, String groupName) {
+        return new GroupJoinRequestSentEvent(
+                memberId,
+                // 뭐 어떻게 위로해 줘야 할지... 그냥 이렇게만 보여 주면 되나... 다음 기회를 노리라고 하면 놀리는 거 같잖아요
+                groupName + "에서 신청을 거절했습니다.",
+                NotificationType.GROUP_JOIN_REJECTION
+        );
+    }
+
+    private void publishGroupJoinEvent(GroupJoinRequestSentEvent sentEvent) {
+        kafkaTemplate.send(
+                "group.join-request.notification",
+                JsonUtils.toJsonString(sentEvent) // 알림 이벤트를 JSON 형태로 변환한 문자열로 전송
+        );
+
+        log.debug("[KAFKA][SENT] message={}", sentEvent.getMessage());
+    }
+
+    private void removeJoinRequestFromRedis(Long groupId, Long memberId) {
+        String key = getRedisKey(groupId);
+        String memberValue = String.valueOf(memberId);
+
+        // 1. 해당 키가 존재하는지 확인 - 그룹에 참여 요청이 도착하지 않았으면 키가 생성되지 않음
+        Boolean keyExists = redisTemplate.hasKey(key);
+        if (!keyExists || keyExists == null) {
+            throw new ServiceException(ErrorCode.JOIN_REQUEST_NOT_FOUND);
+        }
+
+        // 2. 해당 키에 해당하는 멤버가 존재하는지 확인 - 그룹에 해당 멤버가 참여 요청을 보내지 않았으면 키에 값이 없음
+        Boolean memberExists = redisTemplate.opsForSet().isMember(key, memberValue);
+        if (!memberExists || memberExists == null) {
+            throw new ServiceException(ErrorCode.JOIN_REQUEST_MEMBER_NOT_FOUND);
+        }
+
+        // 3. redis 에서 삭제 수행
+        Long removedCount = redisTemplate.opsForSet().remove(key, memberValue);
+
+        // 3-1. 삭제 수행이 실패한 경우 - 이미 처리된 대상
+        if (removedCount == 0L || removedCount == null) {
+            log.warn("[REDIS][REMOVE] key={} memberId={} - 그룹에 참여 요청이 삭제되지 않았습니다.", key, memberId);
+            throw new ServiceException(ErrorCode.JOIN_REQUEST_ALREADY_REMOVED);
+        }
+
+        log.debug("[REDIS][REMOVE] key={} memberId={} - 그룹에 참여 요청이 삭제되었습니다.", key, memberId);
     }
 
     private void verifyGroupLeaderPermission(Long memberId, JoinConfirmRequest request) {
