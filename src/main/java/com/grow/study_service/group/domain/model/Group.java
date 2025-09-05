@@ -95,8 +95,8 @@ public class Group {
                 null, // 자동 생성
                 category,
                 LocalDateTime.now(), // 데이터베이스에 저장될 때는 현재 시각을 사용함.
-                description,
                 name,
+                description,
                 amount,
                 0,
                 personalityTag, // null 가능
