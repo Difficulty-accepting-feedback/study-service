@@ -4,7 +4,10 @@ import com.grow.study_service.common.exception.ErrorCode;
 import com.grow.study_service.common.exception.service.ServiceException;
 import com.grow.study_service.common.util.JsonUtils;
 import com.grow.study_service.group.application.event.GroupJoinRequestSentEvent;
+import com.grow.study_service.group.application.event.MentoringClassPurchaseRequestedEvent;
 import com.grow.study_service.group.application.event.NotificationType;
+import com.grow.study_service.group.domain.enums.Category;
+import com.grow.study_service.group.domain.model.Group;
 import com.grow.study_service.group.domain.repository.GroupRepository;
 import com.grow.study_service.group.infra.persistence.repository.query.GroupQueryRepository;
 import com.grow.study_service.group.presentation.dto.join.JoinConfirmRequest;
@@ -40,7 +43,7 @@ public class GroupJoinServiceImpl implements GroupJoinService {
      * 지정된 멤버를 지정된 그룹에 가입시킵니다.
      * <p>
      * 이 메서드는 먼저 해당 멤버가 이미 그룹에 가입되어 있는지 확인합니다. 이미 가입된 경우 {@link ServiceException}을 발생시킵니다.
-     * 이후 결제 서비스로 결제 요청을 전송해야 하며 (현재 TODO로 표시됨), 성공 시 그룹 멤버를 저장합니다.
+     * 이후 결제 서비스로 결제 요청을 전송해야 하며 성공 시 그룹 멤버를 저장합니다.
      *
      * @param memberId 가입할 멤버의 ID
      * @param groupId  가입할 그룹의 ID
@@ -56,12 +59,24 @@ public class GroupJoinServiceImpl implements GroupJoinService {
             throw new ServiceException(ErrorCode.GROUP_ALREADY_JOINED);
         }
 
-        // TODO 결제 서비스로 결제 요청 전송 필요
+        Group group = groupRepository.findById(groupId).orElseThrow(() ->
+                new ServiceException(ErrorCode.GROUP_NOT_FOUND));
 
-        // 그룹에 멤버 추가
-        groupMemberRepository.save(GroupMember.create(memberId, groupId, Role.MEMBER));
+        // 1. 결제 서비스로 결제 요청 전송 [지금 이 부분]
+        MentoringClassPurchaseRequestedEvent purchaseEvent = new MentoringClassPurchaseRequestedEvent(
+                groupId,
+                memberId,
+                Category.MENTORING,
+                group.getName(),
+                group.getAmount()
+        );
 
-        log.info("[GROUP][JOIN][END] memberId={} groupId={} - 그룹 가입 완료", memberId, groupId);
+        kafkaTemplate.send("group.payment-requests", JsonUtils.toJsonString(purchaseEvent));
+
+        // 2. 결제 서비스에서 오더를 생성 3. 결제 실행 4. 결제 완료 이벤트 발생 [수행 예정]
+        // 멤버 추가는 여기서 하지 않고, 결제 완료 이벤트 리스너에서 처리
+
+        log.info("[GROUP][JOIN][PENDING] memberId={} groupId={} - 결제 요청 전송 완료, 대기 중", memberId, groupId);
     }
 
     /**
@@ -109,7 +124,7 @@ public class GroupJoinServiceImpl implements GroupJoinService {
     private GroupJoinRequestSentEvent createRequestSentEvent(JoinRequest request, String groupName) {
         return new GroupJoinRequestSentEvent(
                 request.getLeaderId(),
-                groupName + "에 새로운 가입 신청이 왔습니다. 어서 확인해 보세요!",
+                groupName + "에 새로운 가입 신청이 왔습니다. 어서 확인해 보세요! ✨",
                 NotificationType.GROUP_JOIN_REQUEST
         );
     }
@@ -165,7 +180,7 @@ public class GroupJoinServiceImpl implements GroupJoinService {
      * 그룹 가입 요청을 수락합니다.
      * 그룹 리더 권한을 확인한 후, 대상 멤버가 이미 그룹에 가입되어 있는지 검사합니다.
      * 이미 가입된 경우 예외를 발생시키고, 그렇지 않으면 새로운 그룹 멤버를 등록합니다.
-     * 등록 후 Kafka 이벤트를 통해 상대방에게 수락 알림을 전송합니다. (TODO 구현 예정)
+     * 등록 후 Kafka 이벤트를 통해 상대방에게 수락 알림을 전송합니다.
      *
      * @param memberId 현재 사용자의 멤버 ID (권한 확인용)
      * @param request 가입 수락 요청 정보 (그룹 ID와 대상 멤버 ID 포함)
@@ -203,7 +218,7 @@ public class GroupJoinServiceImpl implements GroupJoinService {
     private GroupJoinRequestSentEvent createRequestApprovalEvent(Long memberId, String groupName) {
         return new GroupJoinRequestSentEvent(
                 memberId,
-                groupName + "에서 신청을 수락했습니다. 어서 확인해 보세요!",
+                groupName + "에서 신청을 수락했습니다. 어서 확인해 보세요! 🎉",
                 NotificationType.GROUP_JOIN_APPROVAL
         );
     }
@@ -234,8 +249,7 @@ public class GroupJoinServiceImpl implements GroupJoinService {
     private GroupJoinRequestSentEvent createRequestRejectionEvent(Long memberId, String groupName) {
         return new GroupJoinRequestSentEvent(
                 memberId,
-                // 뭐 어떻게 위로해 줘야 할지... 그냥 이렇게만 보여 주면 되나... 다음 기회를 노리라고 하면 놀리는 거 같잖아요
-                groupName + "에서 신청을 거절했습니다.",
+                groupName + "과 아쉽게도 이번에는 함께하지 못하게 되었어요. 🥹",
                 NotificationType.GROUP_JOIN_REJECTION
         );
     }
