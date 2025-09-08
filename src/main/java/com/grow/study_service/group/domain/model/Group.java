@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import com.grow.study_service.group.domain.enums.Category;
 
@@ -195,5 +196,18 @@ public class Group {
         this.viewCount++;
 
         return this;
+    }
+
+    // 총 일수 계산: ChronoUnit 으로 일 단위 차이 (시작일 포함 위해 +1)
+    public double calculateTotalAttendanceDays(LocalDateTime start, LocalDateTime end) {
+        long totalDays = ChronoUnit.DAYS.between(start.toLocalDate(), end.toLocalDate()) + 1;
+
+        if (totalDays <= 0) {
+            // 유효성 검사 (end < start 방지)
+            throw new DomainException(ErrorCode.INVALID_DATE_RANGE);
+        }
+
+        // 소수점 첫째 자리까지만 반올림
+        return Math.round(totalDays * 10) / 10.0;
     }
 }
