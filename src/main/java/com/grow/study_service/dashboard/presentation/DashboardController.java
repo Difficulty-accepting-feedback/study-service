@@ -42,4 +42,16 @@ public class DashboardController {
     }
 
     // 내 출석률 체크하여 보여 주는 API
+    @GetMapping("/attendance-rate/{groupId}")
+    public RsData<Double> getAttendanceRate(@RequestHeader("X-Authorization-Id") Long memberId,
+                                            @PathVariable("groupId") Long groupId) {
+
+        Double attendanceRate = dashboardService.getAttendanceRate(groupId, memberId);
+
+        return new RsData<>(
+                "200",
+                "출석률 조회 완료",
+                attendanceRate
+        );
+    }
 }
