@@ -47,6 +47,8 @@ public class GroupMember {
 	 */
 	private final LocalDateTime joinedAt;
 
+    private int totalAttendanceDays; // 누적 출석일 카운트
+
     private Long version;
 
     /**
@@ -71,6 +73,7 @@ public class GroupMember {
                 groupId,
                 role,
                 LocalDateTime.now(), // 데이터베이스에 저장될 때는 현재 시각을 사용함. (자동 생성)
+                0,
                 null // 버전 자동 생성
         );
     }
@@ -92,6 +95,7 @@ public class GroupMember {
                                  Long groupId,
                                  Role role,
                                  LocalDateTime joinedAt,
+                                 int totalAttendanceDays,
                                  Long version) {
 
         verifyParameters(memberId, groupId, role);
@@ -103,6 +107,7 @@ public class GroupMember {
                 groupId,
                 role,
                 joinedAt,
+                totalAttendanceDays,
                 version
         );
     }
@@ -188,5 +193,13 @@ public class GroupMember {
         if (role != Role.LEADER) {
             throw new DomainException(ErrorCode.GROUP_LEADER_REQUIRED);
         }
+    }
+
+    /**
+     * 출석일 증가 메서드
+     */
+    public GroupMember incrementAttendanceDays() {
+        this.totalAttendanceDays++;
+        return this;
     }
 }
