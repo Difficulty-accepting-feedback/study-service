@@ -29,11 +29,12 @@ public class GroupMapper {
 				entity.getName(),
 				entity.getCategory(),
 				entity.getDescription(),
-				entity.getCreatedAt(),
 				entity.getAmount(),
 				entity.getViewCount(),
 				entity.getPersonalityTag(),
 				entity.getSkillTag(),
+				entity.getStartAt(),
+				entity.getEndAt(),
 				entity.getVersion()
 		);
 	}
@@ -51,7 +52,8 @@ public class GroupMapper {
 				.name(group.getName())
 				.category(group.getCategory())
 				.description(group.getDescription())
-				.createdAt(group.getCreatedAt())
+				.startAt(group.getStartAt())
+				.endAt(group.getEndAt())
 				.amount(group.getAmount())
 				.personalityTag(group.getPersonalityTag())
 				.viewCount(group.getViewCount())
