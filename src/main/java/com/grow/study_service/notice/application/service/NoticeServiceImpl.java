@@ -194,6 +194,21 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     /**
+     * 주어진 그룹 ID에 해당하는 고정된 공지사항의 내용을 가져옵니다.
+     * 대시보드에서 한 줄 공지로 보여주기 위한 용도입니다.
+     * 고정된 공지사항이 없을 경우 null을 반환합니다.
+     *
+     * @param groupId 조회할 그룹 ID
+     * @return 고정된 공지사항의 내용 (String), 없으면 null
+     */
+    @Override
+    public String getPinnedNotice(Long groupId) {
+        return noticeRepository.findByIsPinnedTrue(groupId)
+                .map(Notice::getContent)
+                .orElse(null); // 고정된 공지사항이 없으면 null 반환
+    }
+
+    /**
      * 지정된 그룹에서 해당 회원이 그룹장 권한을 가지고 있는지 검증한다.
      * <p>
      * 1. 멤버 ID와 그룹 ID로 그룹 멤버 정보를 조회

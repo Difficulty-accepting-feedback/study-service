@@ -4,7 +4,6 @@ import com.grow.study_service.notice.domain.model.Notice;
 import com.grow.study_service.notice.domain.repository.NoticeRepository;
 import com.grow.study_service.notice.infra.entity.NoticeJpaEntity;
 import com.grow.study_service.notice.infra.mapper.NoticeMapper;
-import com.grow.study_service.notice.presentation.dto.NoticeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -63,6 +62,14 @@ public class NoticeRepositoryImpl implements NoticeRepository {
                 .map(mapper::toDomain)
                 .toList();
         return list;
+    }
+
+    @Override
+    public Optional<Notice> findByIsPinnedTrue(Long groupId) {
+        return noticeJpaRepository.findByGroupIdAndPinnedIsTrue(groupId)
+                .stream()
+                .map(mapper::toDomain)
+                .findFirst();
     }
 
     @Override
