@@ -63,8 +63,7 @@ public class GroupMember {
      */
     public static GroupMember create(Long memberId,
                                      Long groupId,
-                                     Role role
-    ) {
+                                     Role role) {
 
         verifyParameters(memberId, groupId, role);
         return new GroupMember(
@@ -73,6 +72,7 @@ public class GroupMember {
                 groupId,
                 role,
                 LocalDateTime.now(), // 데이터베이스에 저장될 때는 현재 시각을 사용함. (자동 생성)
+                0,
                 null // 버전 자동 생성
         );
     }
@@ -94,6 +94,7 @@ public class GroupMember {
                                  Long groupId,
                                  Role role,
                                  LocalDateTime joinedAt,
+                                 int totalAttendanceDays,
                                  Long version) {
 
         verifyParameters(memberId, groupId, role);
@@ -105,6 +106,7 @@ public class GroupMember {
                 groupId,
                 role,
                 joinedAt,
+                totalAttendanceDays,
                 version
         );
     }
@@ -206,8 +208,7 @@ public class GroupMember {
      * @param totalDays 출석일 수 (총 출석일 수)
      * @return 출석률 (0 ~ 100), 소수점 첫 자리에서 반올림.
      */
-    public Double calculateTotalAttendanceRate(double totalDays) {
-        double rate = (this.totalAttendanceDays / totalDays) * 100;
-        return Math.round(rate * 10) / 10.0;
+    public double calculateTotalAttendanceRate(long totalDays) {
+        return (this.totalAttendanceDays / (double) totalDays) * 100;
     }
 }
