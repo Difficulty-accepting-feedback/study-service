@@ -45,7 +45,7 @@ class PostFindServiceImplTest {
         Post savedPost = postRepository.save(post);
 
         // 멤버십(권한) 부여: memberId=10이 boardId=100에 속해 있다고 가정
-        GroupMember gm = new GroupMember(null, 100L, 10L, Role.MEMBER, LocalDateTime.now());
+        GroupMember gm = new GroupMember(null, 100L, 10L, Role.MEMBER, LocalDateTime.now(), null);
         groupMemberRepository.save(gm);
 
         // 파일 2개 저장

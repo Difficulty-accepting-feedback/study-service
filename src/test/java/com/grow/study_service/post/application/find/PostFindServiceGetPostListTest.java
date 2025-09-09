@@ -52,12 +52,10 @@ public class PostFindServiceGetPostListTest {
     }
 
     private void seedMembership(Long boardId, Long memberId) {
-        GroupMember gm = new GroupMember(
-                null,
-                boardId,
+        GroupMember gm = GroupMember.create(
                 memberId,
-                Role.MEMBER,
-                LocalDateTime.now()
+                1L,
+                Role.MEMBER
         );
         groupMemberRepository.save(gm);
     }
