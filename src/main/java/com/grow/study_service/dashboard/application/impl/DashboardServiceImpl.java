@@ -34,7 +34,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Transactional
     public void incrementAttendanceDays(Long groupId, Long memberId) {
         GroupMember findMember = groupMemberRepository.findById(memberId).orElseThrow(() ->
-                new DomainException(ErrorCode.GROUP_MEMBER_NOT_FOUND));
+                new ServiceException(ErrorCode.GROUP_MEMBER_NOT_FOUND));
 
         log.info("[DASHBOARD][ATTENDANCE][START] 그룹 {}의 멤버 {}의 출석일을 누적 시작, 현재 출석일={}",
                 groupId, memberId, findMember.getTotalAttendanceDays());
