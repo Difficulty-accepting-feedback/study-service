@@ -199,7 +199,7 @@ public class Group {
     }
 
     // 총 일수 계산: ChronoUnit 으로 일 단위 차이 (시작일 포함 위해 +1)
-    public double calculateTotalAttendanceDays(LocalDateTime start, LocalDateTime end) {
+    public long calculateTotalDays (LocalDateTime start, LocalDateTime end) {
         long totalDays = ChronoUnit.DAYS.between(start.toLocalDate(), end.toLocalDate()) + 1;
 
         if (totalDays <= 0) {
@@ -207,7 +207,18 @@ public class Group {
             throw new DomainException(ErrorCode.INVALID_DATE_RANGE);
         }
 
-        // 소수점 첫째 자리까지만 반올림
-        return Math.round(totalDays * 10) / 10.0;
+        return totalDays;
+    }
+
+    // 시작에서 현재까지의 경과 일수
+    public long calculateElapsedDays(LocalDateTime start) {
+        return ChronoUnit.DAYS.between(start.toLocalDate(), LocalDateTime.now().toLocalDate()) + 1;
+    }
+
+    // 진행률 계산: 남은 일수 / 전체 일수
+    public double calculateProgressPercentage(long elapsedDays, long totalDays) {
+        double rate = (elapsedDays / (double) totalDays) * 100;
+
+        return Math.round(rate * 10) / 10.0;
     }
 }

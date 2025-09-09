@@ -72,7 +72,35 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDateTime start = group.getStartAt();  // 시작일
         LocalDateTime end = group.getEndAt();      // 종료일
 
-        double totalDays = group.calculateTotalAttendanceDays(start, end); // 총 일수 계산 (시작일 포함)
-        return groupMember.calculateTotalAttendanceRate(totalDays); // 총 출석률 계산 (시작일 포함)
+        long totalDays = group.calculateTotalDays(start, end); // 총 일수 계산 (시작일 포함)
+        double rate = groupMember.calculateTotalAttendanceRate(totalDays); // 출석률 계산
+
+        // 소수점 첫째 자리까지만 반올림하여 반환
+        return Math.round(rate * 10) / 10.0;
+    }
+
+    /**
+     * 그룹의 *현재 진행률*을 계산해 퍼센트로 반환한다.
+     *
+     * <p>진행률 계산식:<br>
+     * {@code (elapsedDays / totalDays) * 100}</p>
+     *
+     * @param groupId  진행률을 계산할 그룹 ID
+     * @param memberId 멤버 ID (현재 로직에는 직접 사용되지 않음 - 추후 조건 확인 및 확장성 고려)
+     * @return 진행률(퍼센트) — 소수점 첫째 자리까지 반올림
+     * @throws ServiceException 그룹이 존재하지 않을 때
+     */
+    @Override
+    public Double getProgressPercentage(Long groupId, Long memberId) {
+        Group group = groupRepository.findById(groupId).orElseThrow(() ->
+                new ServiceException(ErrorCode.GROUP_NOT_FOUND));
+
+        LocalDateTime start = group.getStartAt();  // 시작일
+        LocalDateTime end = group.getEndAt();      // 종료일
+
+        long totalDays = group.calculateTotalDays(start, end); // 총 일수 계산 (시작일 포함)
+        long elapsedDays = group.calculateElapsedDays(start);  // 경과 일수 계산 (시작일 포함)
+
+        return group.calculateProgressPercentage(elapsedDays, totalDays); // 진행률 계산
     }
 }
