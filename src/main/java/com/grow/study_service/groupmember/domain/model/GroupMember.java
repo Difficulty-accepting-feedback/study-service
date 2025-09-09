@@ -202,4 +202,15 @@ public class GroupMember {
         this.totalAttendanceDays++;
         return this;
     }
+
+    /**
+     * 출석률 계산 메서드
+     *
+     * @param totalDays 출석일 수 (총 출석일 수)
+     * @return 출석률 (0 ~ 100), 소수점 첫 자리에서 반올림.
+     */
+    public Double calculateTotalAttendanceRate(double totalDays) {
+        double rate = (this.totalAttendanceDays / totalDays) * 100;
+        return Math.round(rate * 10) / 10.0;
+    }
 }

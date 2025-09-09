@@ -71,11 +71,8 @@ public class DashboardServiceImpl implements DashboardService {
 
         LocalDateTime start = group.getStartAt();  // 시작일
         LocalDateTime end = group.getEndAt();      // 종료일
-        int totalAttendanceDays = groupMember.getTotalAttendanceDays(); // 총 출석 일수
 
         double totalDays = group.calculateTotalAttendanceDays(start, end); // 총 일수 계산 (시작일 포함)
-        double rate = (totalAttendanceDays / totalDays) * 100;
-
-        return Math.round(rate * 10) / 10.0;
+        return groupMember.calculateTotalAttendanceRate(totalDays); // 총 출석률 계산 (시작일 포함)
     }
 }
