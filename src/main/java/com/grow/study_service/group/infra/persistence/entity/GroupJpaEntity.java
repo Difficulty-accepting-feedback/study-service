@@ -29,8 +29,6 @@ public class GroupJpaEntity {
 	@Column(columnDefinition = "TEXT")
 	private String description;
 
-	private LocalDateTime createdAt;
-
 	private int amount; // 멘토링 설정 값 (다른 항목에선 0 유지)
 
 	private int viewCount; // 조회수
@@ -40,6 +38,10 @@ public class GroupJpaEntity {
 
 	@Enumerated(EnumType.STRING)
 	private SkillTag skillTag;
+
+	private LocalDateTime startAt; // 시작 날짜
+
+	private LocalDateTime endAt; // 종료 날짜
 
 	@Version
 	private Long version; // 낙관적 락

@@ -31,6 +31,7 @@ public class GroupMemberMapper {
 				entity.getGroupId(),
 				entity.getRole(),
 				entity.getJoinedAt(),
+				entity.getTotalAttendanceDays(),
 				entity.getVersion()
 		);
 	}
@@ -51,6 +52,7 @@ public class GroupMemberMapper {
 				.groupId(domain.getGroupId())
 				.role(domain.getRole())
 				.joinedAt(domain.getJoinedAt())
+				.totalAttendanceDays(domain.getTotalAttendanceDays())
 				.version(domain.getVersion());
 
 		if (domain.getGroupId() != null) {

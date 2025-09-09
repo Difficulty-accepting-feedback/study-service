@@ -31,6 +31,8 @@ public class GroupMemberJpaEntity {
 
 	private LocalDateTime joinedAt;
 
+	private int totalAttendanceDays; // 누적 출석일 카운트
+
 	@Version
 	private Long version;
 }

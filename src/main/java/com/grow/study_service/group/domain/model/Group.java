@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import com.grow.study_service.group.domain.enums.Category;
 
@@ -37,7 +38,12 @@ public class Group {
     /**
      * 그룹이 생성된 날짜와 시간. 생성 시점에 설정되며, 변경되지 않습니다.
      */
-    private final LocalDateTime createdAt;
+    private final LocalDateTime startAt;
+
+    /**
+     * 그룹의 종료 날짜와 시간. 그룹이 종료되기 전까지 유효합니다.
+     */
+    private final LocalDateTime endAt;
 
     /**
      * 그룹의 이름. 업데이트 가능하며, 비어 있지 않아야 합니다.
@@ -69,7 +75,7 @@ public class Group {
      */
     private SkillTag skillTag;
 
-    // TODO 기간 추가
+
 
     private Long version; // 낙관적 락
 
@@ -88,13 +94,15 @@ public class Group {
                                String description,
                                PersonalityTag personalityTag,
                                SkillTag skillTag,
-                               int amount) {
+                               int amount,
+                               LocalDateTime endAt) {
 
         verifyParameters(name, category, description);
         return new Group(
                 null, // 자동 생성
                 category,
                 LocalDateTime.now(), // 데이터베이스에 저장될 때는 현재 시각을 사용함.
+                endAt,
                 name,
                 description,
                 amount,
@@ -125,24 +133,26 @@ public class Group {
      * @param name        그룹 이름.
      * @param category    그룹 카테고리.
      * @param description 그룹 설명.
-     * @param createdAt   그룹 생성 시각.
+     * @param startAt   그룹 생성 시각.
+     * @param endAt 그룹의 종료 시각.
      * @return 조회된 정보를 담은 Group 인스턴스.
      */
     public static Group of(Long groupId,
                            String name,
                            Category category,
                            String description,
-                           LocalDateTime createdAt,
                            int amount,
                            int viewCount,
                            PersonalityTag personalityTag,
                            SkillTag skillTag,
+                           LocalDateTime startAt,
+                           LocalDateTime endAt,
                            Long version) {
 
         return new Group(
                 groupId, category,
-                createdAt, name,
-                description, amount,
+                startAt, endAt,
+                name, description, amount,
                 viewCount, personalityTag,
                 skillTag, version);
     }
@@ -186,5 +196,18 @@ public class Group {
         this.viewCount++;
 
         return this;
+    }
+
+    // 총 일수 계산: ChronoUnit 으로 일 단위 차이 (시작일 포함 위해 +1)
+    public double calculateTotalAttendanceDays(LocalDateTime start, LocalDateTime end) {
+        long totalDays = ChronoUnit.DAYS.between(start.toLocalDate(), end.toLocalDate()) + 1;
+
+        if (totalDays <= 0) {
+            // 유효성 검사 (end < start 방지)
+            throw new DomainException(ErrorCode.INVALID_DATE_RANGE);
+        }
+
+        // 소수점 첫째 자리까지만 반올림
+        return Math.round(totalDays * 10) / 10.0;
     }
 }

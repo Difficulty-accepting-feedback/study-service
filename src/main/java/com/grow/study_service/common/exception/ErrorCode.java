@@ -19,7 +19,8 @@ public enum ErrorCode {
     GROUP_ALREADY_JOINED("409", "이미 가입된 그룹입니다."),
     JOIN_REQUEST_ALREADY_SENT("409", "이미 가입 요청을 보냈습니다." ),
     NO_PERMISSION_TO_ACCEPT_REQUEST("403", "요청을 수락할 권한이 없습니다."),
-    JOIN_REQUEST_NOT_FOUND("404", "해당 그룹에 참여 요청이 전송되지 않았습니다." ),
+    JOIN_REQUEST_NOT_FOUND("404", "해당 그룹에 참여 요청이 전송되지 않았습니다."),
+    INVALID_DATE_RANGE("400", "시작 날짜는 종료 날짜보다 미래일 수 없습니다."),
 
     /**
      * 📌 2. 그룹 멤버(Group Member) 관련
