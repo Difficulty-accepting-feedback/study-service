@@ -46,4 +46,19 @@ public class KanbanBoardController {
                 responses // 칸반보드 리스트
         );
     }
+
+    // 칸반보드 내용 / status / date 변경
+    @PatchMapping("/todos/{todoId}")
+    public RsData<Long> updateTodo(@RequestHeader("X-Authorization-Id") Long memberId,
+                                   @PathVariable("todoId") Long kanbanId,
+                                   @RequestBody TodoCreateRequest request) {
+
+        Long todoId = kanbanBoardService.updateTodo(memberId, request, kanbanId);
+
+        return new RsData<>(
+                "200",
+                "투두 상태 변경 완료",
+                todoId // 칸반보드 ID 단건
+        );
+    }
 }
