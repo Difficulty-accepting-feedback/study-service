@@ -9,4 +9,6 @@ public interface KanbanBoardService {
     Long createTodo(Long memberId, Long groupId, TodoCreateRequest request);
 
     List<KanbanBoardResponse> getTodos(Long memberId, Long groupId);
+
+    Long updateTodo(Long memberId, TodoCreateRequest request, Long kanbanId);
 }
