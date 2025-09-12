@@ -40,7 +40,7 @@ public class DataInit implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // redis 초기화 로직 실행
-        redisConnectionFactory.getConnection().serverCommands().flushAll();
+        // redisConnectionFactory.getConnection().serverCommands().flushAll();
         log.debug("redis flush all.");
 
         List<Group> groups = new ArrayList<>();
