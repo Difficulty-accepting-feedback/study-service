@@ -81,7 +81,12 @@ public enum ErrorCode {
     COMMENT_ALREADY_EXISTS("409", "이미 동일한 댓글이 존재합니다." ),
     COMMENT_NOT_FOUND("404", "댓글을 찾을 수 없습니다."),
     INVALID_COMMENT_ACCESS("403", "이 댓글에 접근할 권한이 없습니다." ),
-    ;
+
+    /**
+     * 📌 6. 칸반보드 (TO-DO) 관련
+     */
+    TODO_NOT_FOUND("404", "해당 TO-DO를 찾을 수 없습니다." ),
+    CANNOT_CHANGE_STATUS_OF_COMPLETED_TODO("403", "이미 완료된 TO-DO의 상태를 변경할 수 없습니다." ), ;
 
     private final String code;
     private final String message;
