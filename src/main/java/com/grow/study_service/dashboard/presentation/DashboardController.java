@@ -2,13 +2,14 @@ package com.grow.study_service.dashboard.presentation;
 
 import com.grow.study_service.common.rsdata.RsData;
 import com.grow.study_service.dashboard.application.DashboardService;
+import com.grow.study_service.kanbanboard.presentation.controller.KanbanBoardController;
 import com.grow.study_service.notice.application.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/dashboard")
+@RequestMapping("/api/v1/study/dashboard")
 public class DashboardController {
 
     private final NoticeService noticeService;
@@ -71,13 +72,11 @@ public class DashboardController {
 
     // == 칸반보드 (To-do list) API ==
 
-    // 투두 조회
-
-    // 투두 등록
-
-    // 투두 상태 변경 (시작 전에서 실행 중 / 완료)
-
-
+    /**
+     * == 칸반보드 (To-do list) API ==
+     * TodoController 에서 구현될 예정입니다.
+     * @see KanbanBoardController
+     */
 
     // 오늘의 퀴즈
 }
