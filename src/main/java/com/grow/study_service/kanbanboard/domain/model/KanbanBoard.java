@@ -4,45 +4,48 @@ import java.time.LocalDateTime;
 
 import com.grow.study_service.kanbanboard.domain.enums.KanbanStatus;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class KanbanBoard {
-	private final Long toDoId;
+	private final Long kanbanId;
 	private final Long GroupMemberId;
-	private String toDoContent;
-	private KanbanStatus isCompleted;
+	private String content;
+	private KanbanStatus status;
 	private LocalDateTime startDate;
 	private LocalDateTime endDate;
 
-	private KanbanBoard (Long toDoId, Long groupMemberId, String toDoContent, KanbanStatus isCompleted,
-			LocalDateTime startDate, LocalDateTime endDate) {
-		this.toDoId = toDoId;
-		this.GroupMemberId = groupMemberId;
-		this.toDoContent = toDoContent;
-		this.isCompleted = isCompleted;
-		this.startDate = startDate;
-		this.endDate = endDate;
-	}
-
-	public static KanbanBoard create(Long groupMemberId, String toDoContent, LocalDateTime startDate, LocalDateTime endDate) {
-		return new KanbanBoard(null, groupMemberId, toDoContent, KanbanStatus.READY, startDate, endDate);
+	public static KanbanBoard create(Long groupMemberId,
+									 String content,
+									 LocalDateTime startDate,
+									 LocalDateTime endDate
+	) {
+		return new KanbanBoard(
+				null,
+				groupMemberId,
+				content,
+				KanbanStatus.READY,
+				startDate,
+				endDate
+		);
 	}
 
 	public void updateContent(String newContent) {
 		if (newContent == null || newContent.isBlank()) {
 			throw new IllegalArgumentException("할 일 내용은 비어 있을 수 없습니다.");
 		}
-		this.toDoContent = newContent;
+		this.content = newContent;
 	}
 
 	public void markInProgress(LocalDateTime now) {
-		this.isCompleted = KanbanStatus.IN_PROGRESS;
+		this.status = KanbanStatus.IN_PROGRESS;
 		this.startDate   = now;
 	}
 
 	public void markDone(LocalDateTime now) {
-		this.isCompleted = KanbanStatus.DONE;
+		this.status = KanbanStatus.DONE;
 		this.endDate     = now;
 	}
 
@@ -56,7 +59,7 @@ public class KanbanBoard {
 		if (newStart.isBefore(LocalDateTime.now())) {
 			throw new IllegalArgumentException("시작일은 현재 이후여야 합니다.");
 		}
-		if (this.isCompleted == KanbanStatus.DONE) {
+		if (this.status == KanbanStatus.DONE) {
 			throw new IllegalStateException("완료된 할 일은 일정을 변경할 수 없습니다.");
 		}
 

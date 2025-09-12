@@ -18,10 +18,10 @@ public class KanbanBoardMapper {
 
 	public static KanbanBoardJpaEntity toEntity(KanbanBoard d) {
 		return KanbanBoardJpaEntity.builder()
-			.toDoId(d.getToDoId())
+			.toDoId(d.getKanbanId())
 			.groupMemberId(d.getGroupMemberId())
-			.toDoContent(d.getToDoContent())
-			.isCompleted(d.getIsCompleted())
+			.toDoContent(d.getContent())
+			.isCompleted(d.getStatus())
 			.startDate(d.getStartDate())
 			.endDate(d.getEndDate())
 			.build();
