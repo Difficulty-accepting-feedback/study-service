@@ -86,7 +86,8 @@ public enum ErrorCode {
      * 📌 6. 칸반보드 (TO-DO) 관련
      */
     TODO_NOT_FOUND("404", "해당 TO-DO를 찾을 수 없습니다." ),
-    CANNOT_CHANGE_STATUS_OF_COMPLETED_TODO("403", "이미 완료된 TO-DO의 상태를 변경할 수 없습니다." ), ;
+    CANNOT_CHANGE_STATUS_OF_COMPLETED_TODO("403", "이미 완료된 TO-DO의 상태를 변경할 수 없습니다." ),
+    CANNOT_DELETE_KANBANBOARD("403", "이 TO-DO를 삭제할 권한이 없습니다.");
 
     private final String code;
     private final String message;

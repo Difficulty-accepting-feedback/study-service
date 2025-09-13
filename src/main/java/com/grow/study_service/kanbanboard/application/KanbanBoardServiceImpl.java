@@ -118,4 +118,40 @@ public class KanbanBoardServiceImpl implements KanbanBoardService {
 
         return saved.getKanbanId();
     }
+
+    /**
+     * KanbanBoard(투두) 항목을 **하드 딜리트** 방식으로 영구 삭제합니다.
+     * <p>
+     * 처리 흐름
+     * 1. {@code kanbanId}로 투두를 조회하여 존재 여부를 확인합니다.
+     * 2. 투두가 속한 {@code GroupMember}를 조회한 뒤, 요청자의 {@code memberId}와 일치하는지 검증합니다.
+     * 3. 권한 검증에 통과하면 {@link org.springframework.data.jpa.repository.JpaRepository#delete(Object)}
+     *    를 호출하여 영구적으로 삭제합니다.
+     *
+     * @param kanbanId 삭제할 투두의 ID
+     * @param memberId 요청 회원의 ID (본인 소유 투두인지 검증)
+     *
+     * @throws ServiceException TODO_NOT_FOUND
+     *         투두가 존재하지 않을 때 발생합니다.
+     * @throws ServiceException GROUP_MEMBER_NOT_FOUND
+     *         투두와 연결된 그룹 멤버가 존재하지 않을 때 발생합니다.
+     * @throws DomainException (또는 ValidationException)
+     *         {@code validateMemberId} 검증에 실패하여 권한이 없을 때 발생합니다.
+     */
+    @Override
+    @Transactional
+    public void deleteTodo(Long kanbanId, Long memberId) {
+        KanbanBoard findTodo = kanbanBoardRepository.findById(kanbanId).orElseThrow(() ->
+                new ServiceException(ErrorCode.TODO_NOT_FOUND));
+
+        Long groupMemberId = findTodo.getGroupMemberId();
+
+        GroupMember findGroupMember = groupMemberRepository.findById(groupMemberId).orElseThrow(() ->
+                new ServiceException(ErrorCode.GROUP_MEMBER_NOT_FOUND));
+
+        // 권한 검증 (그룹 멤버의 ID 와 멤버의 ID 가 동일한지 확인)
+        findGroupMember.validateMemberId(memberId);
+
+        kanbanBoardRepository.delete(findTodo);
+    }
 }
