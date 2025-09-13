@@ -11,6 +11,8 @@ import com.grow.study_service.group.domain.repository.GroupRepository;
 import com.grow.study_service.groupmember.domain.enums.Role;
 import com.grow.study_service.groupmember.domain.model.GroupMember;
 import com.grow.study_service.groupmember.domain.repository.GroupMemberRepository;
+import com.grow.study_service.kanbanboard.domain.model.KanbanBoard;
+import com.grow.study_service.kanbanboard.domain.repository.KanbanBoardRepository;
 import com.grow.study_service.notice.domain.model.Notice;
 import com.grow.study_service.notice.domain.repository.NoticeRepository;
 import com.grow.study_service.post.domain.model.Post;
@@ -36,11 +38,12 @@ public class DataInit implements CommandLineRunner {
     private final BoardRepository boardRepository;
     private final RedisConnectionFactory redisConnectionFactory;
     private final NoticeRepository noticeRepository;
+    private final KanbanBoardRepository kanbanboardRepository;
 
     @Override
     public void run(String... args) throws Exception {
         // redis 초기화 로직 실행
-        redisConnectionFactory.getConnection().serverCommands().flushAll();
+        // redisConnectionFactory.getConnection().serverCommands().flushAll();
         log.debug("redis flush all.");
 
         List<Group> groups = new ArrayList<>();
@@ -156,6 +159,78 @@ public class DataInit implements CommandLineRunner {
 
         notices.forEach(noticeRepository::save);  // NoticeRepository로 저장
 
-        log.info("Data init completed.");
+        // ------- KanbanBoard 더미 데이터 초기화 추가: groupMemberId=1로 30개 생성 ------- //
+        List<KanbanBoard> kanbanBoards = new ArrayList<>();
+
+        // 30개의 더미 데이터 생성 (2025년 8~10월 다양한 날짜 사용)
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #1", LocalDateTime.parse("2025-10-18T00:00:00"), LocalDateTime.parse("2025-10-26T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #2", LocalDateTime.parse("2025-08-19T00:00:00"), LocalDateTime.parse("2025-08-26T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #3", LocalDateTime.parse("2025-09-29T00:00:00"), LocalDateTime.parse("2025-10-05T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #4", LocalDateTime.parse("2025-08-09T00:00:00"), LocalDateTime.parse("2025-08-11T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #5", LocalDateTime.parse("2025-09-08T00:00:00"), LocalDateTime.parse("2025-09-15T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #6", LocalDateTime.parse("2025-10-30T00:00:00"), LocalDateTime.parse("2025-11-01T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #7", LocalDateTime.parse("2025-08-04T00:00:00"), LocalDateTime.parse("2025-08-13T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #8", LocalDateTime.parse("2025-10-09T00:00:00"), LocalDateTime.parse("2025-10-15T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #9", LocalDateTime.parse("2025-08-21T00:00:00"), LocalDateTime.parse("2025-08-23T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #10", LocalDateTime.parse("2025-08-14T00:00:00"), LocalDateTime.parse("2025-08-20T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #11", LocalDateTime.parse("2025-08-08T00:00:00"), LocalDateTime.parse("2025-08-13T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #12", LocalDateTime.parse("2025-09-20T00:00:00"), LocalDateTime.parse("2025-09-27T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #13", LocalDateTime.parse("2025-08-01T00:00:00"), LocalDateTime.parse("2025-08-03T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #14", LocalDateTime.parse("2025-10-17T00:00:00"), LocalDateTime.parse("2025-10-27T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #15", LocalDateTime.parse("2025-09-24T00:00:00"), LocalDateTime.parse("2025-09-29T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #16", LocalDateTime.parse("2025-09-02T00:00:00"), LocalDateTime.parse("2025-09-04T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #17", LocalDateTime.parse("2025-09-22T00:00:00"), LocalDateTime.parse("2025-09-29T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #18", LocalDateTime.parse("2025-10-08T00:00:00"), LocalDateTime.parse("2025-10-18T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #19", LocalDateTime.parse("2025-10-04T00:00:00"), LocalDateTime.parse("2025-10-10T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #20", LocalDateTime.parse("2025-10-03T00:00:00"), LocalDateTime.parse("2025-10-09T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #21", LocalDateTime.parse("2025-08-05T00:00:00"), LocalDateTime.parse("2025-08-15T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #22", LocalDateTime.parse("2025-10-17T00:00:00"), LocalDateTime.parse("2025-10-26T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #23", LocalDateTime.parse("2025-08-27T00:00:00"), LocalDateTime.parse("2025-09-03T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #24", LocalDateTime.parse("2025-08-31T00:00:00"), LocalDateTime.parse("2025-09-02T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #25", LocalDateTime.parse("2025-08-19T00:00:00"), LocalDateTime.parse("2025-08-29T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #26", LocalDateTime.parse("2025-09-18T00:00:00"), LocalDateTime.parse("2025-09-26T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #27", LocalDateTime.parse("2025-10-22T00:00:00"), LocalDateTime.parse("2025-10-29T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #28", LocalDateTime.parse("2025-09-11T00:00:00"), LocalDateTime.parse("2025-09-12T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #29", LocalDateTime.parse("2025-09-08T00:00:00"), LocalDateTime.parse("2025-09-18T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(1L, "더미 할 일 #30", LocalDateTime.parse("2025-09-08T00:00:00"), LocalDateTime.parse("2025-09-11T00:00:00")));
+
+        // ------- KanbanBoard 더미 데이터 초기화: groupMemberId=2로 30개 생성 ------- //
+
+        // 30개의 더미 데이터 생성 (2025년 8~10월 다양한 날짜 사용, groupMemberId=2, content 변경)
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #1", LocalDateTime.parse("2025-10-18T00:00:00"), LocalDateTime.parse("2025-10-26T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #2", LocalDateTime.parse("2025-08-19T00:00:00"), LocalDateTime.parse("2025-08-26T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #3", LocalDateTime.parse("2025-09-29T00:00:00"), LocalDateTime.parse("2025-10-05T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #4", LocalDateTime.parse("2025-08-09T00:00:00"), LocalDateTime.parse("2025-08-11T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #5", LocalDateTime.parse("2025-09-08T00:00:00"), LocalDateTime.parse("2025-09-15T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #6", LocalDateTime.parse("2025-10-30T00:00:00"), LocalDateTime.parse("2025-11-01T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #7", LocalDateTime.parse("2025-08-04T00:00:00"), LocalDateTime.parse("2025-08-13T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #8", LocalDateTime.parse("2025-10-09T00:00:00"), LocalDateTime.parse("2025-10-15T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #9", LocalDateTime.parse("2025-08-21T00:00:00"), LocalDateTime.parse("2025-08-23T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #10", LocalDateTime.parse("2025-08-14T00:00:00"), LocalDateTime.parse("2025-08-20T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #11", LocalDateTime.parse("2025-08-08T00:00:00"), LocalDateTime.parse("2025-08-13T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #12", LocalDateTime.parse("2025-09-20T00:00:00"), LocalDateTime.parse("2025-09-27T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #13", LocalDateTime.parse("2025-08-01T00:00:00"), LocalDateTime.parse("2025-08-03T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #14", LocalDateTime.parse("2025-10-17T00:00:00"), LocalDateTime.parse("2025-10-27T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #15", LocalDateTime.parse("2025-09-24T00:00:00"), LocalDateTime.parse("2025-09-29T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #16", LocalDateTime.parse("2025-09-02T00:00:00"), LocalDateTime.parse("2025-09-04T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #17", LocalDateTime.parse("2025-09-22T00:00:00"), LocalDateTime.parse("2025-09-29T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #18", LocalDateTime.parse("2025-10-08T00:00:00"), LocalDateTime.parse("2025-10-18T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #19", LocalDateTime.parse("2025-10-04T00:00:00"), LocalDateTime.parse("2025-10-10T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #20", LocalDateTime.parse("2025-10-03T00:00:00"), LocalDateTime.parse("2025-10-09T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #21", LocalDateTime.parse("2025-08-05T00:00:00"), LocalDateTime.parse("2025-08-15T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #22", LocalDateTime.parse("2025-10-17T00:00:00"), LocalDateTime.parse("2025-10-26T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #23", LocalDateTime.parse("2025-08-27T00:00:00"), LocalDateTime.parse("2025-09-03T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #24", LocalDateTime.parse("2025-08-31T00:00:00"), LocalDateTime.parse("2025-09-02T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #25", LocalDateTime.parse("2025-08-19T00:00:00"), LocalDateTime.parse("2025-08-29T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #26", LocalDateTime.parse("2025-09-18T00:00:00"), LocalDateTime.parse("2025-09-26T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #27", LocalDateTime.parse("2025-10-22T00:00:00"), LocalDateTime.parse("2025-10-29T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #28", LocalDateTime.parse("2025-09-11T00:00:00"), LocalDateTime.parse("2025-09-12T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #29", LocalDateTime.parse("2025-09-08T00:00:00"), LocalDateTime.parse("2025-09-18T00:00:00")));
+        kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #30", LocalDateTime.parse("2025-09-08T00:00:00"), LocalDateTime.parse("2025-09-11T00:00:00")));
+
+        // 모든 KanbanBoard 저장
+        kanbanBoards.forEach(kanbanboardRepository::save);
+
+        log.info("[INIT] 데이터 초기화 완료");
     }
 }

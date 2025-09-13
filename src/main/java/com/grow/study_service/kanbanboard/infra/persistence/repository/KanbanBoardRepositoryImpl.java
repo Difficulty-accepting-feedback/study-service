@@ -1,5 +1,6 @@
 package com.grow.study_service.kanbanboard.infra.persistence.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,5 +42,24 @@ public class KanbanBoardRepositoryImpl implements KanbanBoardRepository {
 	@Override
 	public void delete(KanbanBoard board) {
 		kanbanBoardJpaRepository.delete(KanbanBoardMapper.toEntity(board));
+	}
+
+	/**
+	 * 그룹 멤버 ID를 기준으로 지정된 날짜 범위 내의 KanbanBoard 목록을 조회합니다.
+	 * JPA 리포지토리를 통해 엔티티를 조회한 후, 도메인 객체로 매핑하여 반환합니다.
+	 *
+	 * @param groupMemberId 그룹 멤버 ID
+	 * @param startDate 범위 시작 날짜/시간 (포함)
+	 * @param endDate 범위 종료 날짜/시간 (포함)
+	 * @return 해당 범위 내 KanbanBoard 도메인 객체 목록
+	 */
+	@Override
+	public List<KanbanBoard> findByGroupMemberIdAndDateBetween(Long groupMemberId,
+															   LocalDateTime startDate,
+															   LocalDateTime endDate) {
+		return kanbanBoardJpaRepository.findByGroupMemberIdAndDateBetween(groupMemberId, startDate, endDate)
+				.stream()
+				.map(KanbanBoardMapper::toDomain)
+				.toList();
 	}
 }

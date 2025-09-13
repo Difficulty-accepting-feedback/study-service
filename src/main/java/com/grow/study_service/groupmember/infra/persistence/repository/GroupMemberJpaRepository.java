@@ -48,4 +48,6 @@ public interface GroupMemberJpaRepository
                      @Param("memberId") Long memberId);
 
     boolean existsByMemberIdAndGroupId(Long memberId, Long groupId);
+
+    Optional<GroupMemberJpaEntity> findByGroupIdAndMemberId(Long groupId, Long memberId);
 }

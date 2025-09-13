@@ -14,10 +14,15 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Builder
-@Table(name = "kanban_board")
+@Table(
+		name = "kanban_board",
+		indexes = {
+				// groupMemberId로 필터링 후 startDate로 범위 검색
+				@Index(name = "idx_group_member_start_date", columnList = "groupMemberId, startDate")
+		}
+)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-
 public class KanbanBoardJpaEntity {
 
 	@Id

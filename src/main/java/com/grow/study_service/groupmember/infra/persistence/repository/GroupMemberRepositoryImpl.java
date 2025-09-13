@@ -96,4 +96,17 @@ public class GroupMemberRepositoryImpl implements GroupMemberRepository {
 	public boolean existsByMemberIdAndGroupId(Long memberId, Long groupId) {
 		return groupMemberJpaRepository.existsByMemberIdAndGroupId(memberId, groupId);
 	}
+
+	/**
+	 * 주어진 그룹 ID와 멤버 ID로 그룹 멤버를 조회합니다.
+	 *
+	 * @param groupId 그룹의 고유 식별자
+	 * @param memberId 멤버의 고유 식별자
+	 * @return 조회된 그룹 멤버를 포함한 Optional 객체. 존재하지 않으면 빈 Optional 반환.
+	 */
+	@Override
+	public Optional<GroupMember> findByGroupIdAndMemberId(Long groupId, Long memberId) {
+		return groupMemberJpaRepository.findByGroupIdAndMemberId(groupId, memberId)
+				.map(GroupMemberMapper::toDomain);
+	}
 }
