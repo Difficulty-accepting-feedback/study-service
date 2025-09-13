@@ -1,4 +1,4 @@
-package com.grow.study_service.kanbanboard.application.scheduler;
+package com.grow.study_service.kanbanboard.application.scheduler.batch;
 
 import com.grow.study_service.kanbanboard.domain.model.KanbanBoard;
 import com.grow.study_service.kanbanboard.infra.persistence.entity.KanbanBoardJpaEntity;
