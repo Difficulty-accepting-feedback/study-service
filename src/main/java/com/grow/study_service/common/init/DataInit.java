@@ -228,6 +228,25 @@ public class DataInit implements CommandLineRunner {
         kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #29", LocalDateTime.parse("2025-09-08T00:00:00"), LocalDateTime.parse("2025-09-18T00:00:00")));
         kanbanBoards.add(KanbanBoard.create(2L, "멤버 2의 더미 할 일 #30", LocalDateTime.parse("2025-09-08T00:00:00"), LocalDateTime.parse("2025-09-11T00:00:00")));
 
+        // ------- 배치 테스트를 위한 추가 200개 KanbanBoard 더미 데이터 생성 (groupMemberId=1, 오늘 날짜 기준) ------- //
+        LocalDateTime today = LocalDateTime.now();  // 오늘 날짜/시간
+
+        // 배치로 변경이 되어야 하는 내역
+        for (int i = 0; i < 100; i++) {
+            String content = "테스트 더미 할 일 #" + (i + 1);
+            LocalDateTime startDate = today;  // 오늘
+            LocalDateTime endDate = startDate.plusDays(1);  // startDate + 1일
+            kanbanBoards.add(KanbanBoard.create(1L, content, startDate, endDate));
+        }
+
+        // 변경이 되지 말아야 하는 내역
+        for (int i = 0; i < 100; i++) {
+            String content = "테스트 더미 할 일 2 #" + (i + 1);
+            LocalDateTime startDate = today.plusDays(i);  // 오늘 + i일
+            LocalDateTime endDate = startDate.plusDays(1);  // startDate + 1일
+            kanbanBoards.add(KanbanBoard.create(1L, content, startDate, endDate));
+        }
+
         // 모든 KanbanBoard 저장
         kanbanBoards.forEach(kanbanboardRepository::save);
 
