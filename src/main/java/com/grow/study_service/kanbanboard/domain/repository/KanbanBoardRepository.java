@@ -9,7 +9,6 @@ import com.grow.study_service.kanbanboard.domain.model.KanbanBoard;
 public interface KanbanBoardRepository {
 	KanbanBoard save(KanbanBoard kanbanBoard);
 	Optional<KanbanBoard> findById(Long toDoId);
-	List<KanbanBoard> findByGroupMemberId(Long groupMemberId);
 	void delete(KanbanBoard kanbanBoard);
 	List<KanbanBoard> findByGroupMemberIdAndDateBetween(Long groupMemberId, LocalDateTime startDate, LocalDateTime endDate);
 }
