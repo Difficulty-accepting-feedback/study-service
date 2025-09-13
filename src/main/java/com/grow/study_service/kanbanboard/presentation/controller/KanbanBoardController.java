@@ -61,4 +61,17 @@ public class KanbanBoardController {
                 todoId // 칸반보드 ID 단건
         );
     }
+
+    // 칸반보드 삭제
+    @DeleteMapping("/todos/{todoId}")
+    public RsData<Void> deleteTodo(@RequestHeader("X-Authorization-Id") Long memberId,
+                                   @PathVariable("todoId") Long kanbanId) {
+
+        kanbanBoardService.deleteTodo(kanbanId, memberId);
+
+        return new RsData<>(
+                "200",
+                "투두 삭제 완료"
+        );
+    }
 }
