@@ -1,5 +1,6 @@
 package com.grow.study_service.kanbanboard.application.scheduler.batch;
 
+import com.grow.study_service.kanbanboard.domain.enums.KanbanStatus;
 import com.grow.study_service.kanbanboard.domain.model.KanbanBoard;
 import com.grow.study_service.kanbanboard.infra.persistence.entity.KanbanBoardJpaEntity;
 import com.grow.study_service.kanbanboard.infra.persistence.mapper.KanbanBoardMapper;
@@ -115,15 +116,16 @@ public class KanbanStatusUpdateConfig {
     public JpaPagingItemReader<KanbanBoardJpaEntity> kanbanBoardReader() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfDay = now.with(LocalTime.MIN);  // 해당 날짜의 00:00:00
-        LocalDateTime endOfDay = now.with(LocalTime.MAX).plusSeconds(1);  // 다음 날 00:00:00 (포함되지 않음)
+        LocalDateTime endOfDay = now.with(LocalTime.MAX).plusDays(1);  // 다음 날 00:00:00 (포함되지 않음)
 
         return new JpaPagingItemReaderBuilder<KanbanBoardJpaEntity>()
                 .name("kanbanBoardReader")
                 .entityManagerFactory(entityManagerFactory)
                 .pageSize(100)  // 페이징으로 100개씩 읽기
                 .queryString("SELECT k FROM KanbanBoardJpaEntity k " +
-                        "WHERE k.startDate >= :startOfDay AND k.startDate < :endOfDay")  // 범위 비교로 날짜만 일치
-                .parameterValues(Map.of("startOfDay", startOfDay, "endOfDay", endOfDay))
+                        "WHERE k.isCompleted = :isCompleted " +
+                        "AND k.startDate >= :startOfDay AND k.startDate < :endOfDay")  // 범위 비교로 날짜만 일치
+                .parameterValues(Map.of("startOfDay", startOfDay, "endOfDay", endOfDay, "isCompleted", KanbanStatus.READY))
                 .build();
     }
 
