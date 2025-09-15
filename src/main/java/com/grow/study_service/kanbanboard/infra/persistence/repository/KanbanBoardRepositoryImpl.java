@@ -33,13 +33,6 @@ public class KanbanBoardRepositoryImpl implements KanbanBoardRepository {
 	}
 
 	@Override
-	public List<KanbanBoard> findByGroupMemberId(Long groupMemberId) {
-		return kanbanBoardJpaRepository.findByGroupMemberId(groupMemberId).stream()
-			.map(KanbanBoardMapper::toDomain)
-			.collect(Collectors.toList());
-	}
-
-	@Override
 	public void delete(KanbanBoard board) {
 		kanbanBoardJpaRepository.delete(KanbanBoardMapper.toEntity(board));
 	}
@@ -62,4 +55,18 @@ public class KanbanBoardRepositoryImpl implements KanbanBoardRepository {
 				.map(KanbanBoardMapper::toDomain)
 				.toList();
 	}
+
+/*	*//**
+	 * 주어진 시간과 startDate가 정확히 동일한 KanbanBoard 목록을 반환합니다.
+	 *
+	 * @param date 비교할 시간
+	 * @return 해당 startDate와 동일한 KanbanBoard 목록
+	 *//*
+	@Override
+	public List<KanbanBoard> findAllByStartDateEquals(LocalDateTime date) {
+		return kanbanBoardJpaRepository.findAllByStartDateEquals(date)
+				.stream()
+				.map(KanbanBoardMapper::toDomain)
+				.toList();
+	}*/
 }

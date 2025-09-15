@@ -211,4 +211,10 @@ public class GroupMember {
     public double calculateTotalAttendanceRate(long totalDays) {
         return (this.totalAttendanceDays / (double) totalDays) * 100;
     }
+
+    public void validateMemberId(Long memberId) {
+        if (!this.memberId.equals(memberId)) {
+            throw new DomainException(ErrorCode.CANNOT_DELETE_KANBANBOARD);
+        }
+    }
 }

@@ -11,4 +11,6 @@ public interface KanbanBoardService {
     List<KanbanBoardResponse> getTodos(Long memberId, Long groupId);
 
     Long updateTodo(Long memberId, TodoCreateRequest request, Long kanbanId);
+
+    void deleteTodo(Long kanbanId, Long memberId);
 }

@@ -109,4 +109,13 @@ public class KanbanBoard {
 			this.endDate = request.getEndDate();
 		}
 	}
+
+	/**
+	 * 준비 중인 칸반보드의 Status 를 진행 중으로 변경합니다.
+	 */
+	public void updateStatus() {
+		if (this.status == KanbanStatus.READY) {
+			this.status = KanbanStatus.IN_PROGRESS; // 진행 중으로 상태 변경
+		}
+	}
 }
