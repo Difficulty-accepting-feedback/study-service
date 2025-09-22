@@ -34,7 +34,7 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
         QGroupMemberJpaEntity groupMember = groupMemberJpaEntity;
         QGroupJpaEntity group = QGroupJpaEntity.groupJpaEntity;
 
-        List<Tuple> tupleList = factory.select(group.id, group.name, groupMember.role, groupMember.joinedAt)
+        List<Tuple> tupleList = factory.select(group.id, group.name, groupMember.role, groupMember.joinedAt, group.skillTag)
                 .from(groupMember)
                 .join(group)
                 .on(groupMember.groupId.eq(group.id)) // ID 기반 (GroupMember 테이블과 Group 테이블을 조인)
@@ -50,7 +50,8 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                         tuple.get(group.id),
                         tuple.get(group.name),
                         tuple.get(groupMember.role),
-                        tuple.get(groupMember.joinedAt)
+                        tuple.get(groupMember.joinedAt),
+                        tuple.get(group.skillTag)
                 ))
                 .toList();
     }

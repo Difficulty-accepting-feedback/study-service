@@ -1,5 +1,6 @@
 package com.grow.study_service.group.presentation.dto;
 
+import com.grow.study_service.group.domain.enums.SkillTag;
 import com.grow.study_service.groupmember.domain.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,4 +15,5 @@ public class GroupSimpleResponse {
     private String groupName; // 그룹 이름
     private Role role; // 그룹 내부에서의 역할 (리더, 멤버)
     private LocalDateTime joinedAt; // 그룹 가입 시기
+    private SkillTag skillTag;
 }
