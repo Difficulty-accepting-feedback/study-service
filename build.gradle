@@ -124,6 +124,12 @@ dependencies {
 
 	// batch
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
+
+	// elasticsearch
+	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
+	// mysql
+	runtimeOnly 'com.mysql:mysql-connector-j'
 }
 
 tasks.named('test') {
