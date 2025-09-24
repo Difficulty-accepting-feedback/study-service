@@ -35,6 +35,8 @@ public class GroupCreateServiceImpl implements GroupCreateService {
     @Override
     @Transactional
     public Long createGroup(GroupCreateRequest request, Long memberId) {
+        log.info("[GROUP][CREATE][START] 생성자={} - 그룹 생성 시작", memberId);
+
         // 1. 같은 이름으로 생성된 그룹이 있는지 확인하기 (중복 방지)
         if (groupRepository.existsByGroupName(request.getName())) {
             throw new ServiceException(ErrorCode.GROUP_ALREADY_EXISTS);
@@ -49,6 +51,7 @@ public class GroupCreateServiceImpl implements GroupCreateService {
         // 5. 그룹에 그룹 멤버를 추가, 리더로 지정
         groupMemberRepository.save(GroupMember.create(memberId, saved.getGroupId(), Role.LEADER));
 
+        log.info("[GROUP][CREATE][END] 생성자={} - 그룹 생성 완료 groupId={}", memberId, saved.getGroupId());
         return saved.getGroupId();
     }
 
