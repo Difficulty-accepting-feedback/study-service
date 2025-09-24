@@ -21,6 +21,7 @@ public enum ErrorCode {
     NO_PERMISSION_TO_ACCEPT_REQUEST("403", "요청을 수락할 권한이 없습니다."),
     JOIN_REQUEST_NOT_FOUND("404", "해당 그룹에 참여 요청이 전송되지 않았습니다."),
     INVALID_DATE_RANGE("400", "시작 날짜는 종료 날짜보다 미래일 수 없습니다."),
+    GROUP_ALREADY_EXISTS("409", "해당 이름은 이미 존재하는 그룹입니다. 그룹명과 카테고리를 확인해 주세요." ),
 
     /**
      * 📌 2. 그룹 멤버(Group Member) 관련
@@ -87,7 +88,7 @@ public enum ErrorCode {
      */
     TODO_NOT_FOUND("404", "해당 TO-DO를 찾을 수 없습니다." ),
     CANNOT_CHANGE_STATUS_OF_COMPLETED_TODO("403", "이미 완료된 TO-DO의 상태를 변경할 수 없습니다." ),
-    CANNOT_DELETE_KANBANBOARD("403", "이 TO-DO를 삭제할 권한이 없습니다.");
+    CANNOT_DELETE_KANBANBOARD("403", "이 TO-DO를 삭제할 권한이 없습니다."), ;
 
     private final String code;
     private final String message;

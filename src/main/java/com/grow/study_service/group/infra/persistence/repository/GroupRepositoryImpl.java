@@ -53,4 +53,14 @@ public class GroupRepositoryImpl implements GroupRepository {
 	public String findGroupNameById(Long groupId) {
 		return groupJpaRepository.findGroupNameById(groupId);
 	}
+
+	/**
+	 * 주어진 그룹 이름이 이미 존재하는지 확인합니다.
+	 * @param groupName - 검사할 그룹 이름 (필수, null 불가)
+	 * @return 그룹 이름이 이미 존재하는지 여부 (true/false) - 존재하면 true, 없으면 false를 반환합니다.
+	 */
+	@Override
+	public boolean existsByGroupName(String groupName) {
+		return groupJpaRepository.existsByName((groupName));
+	}
 }

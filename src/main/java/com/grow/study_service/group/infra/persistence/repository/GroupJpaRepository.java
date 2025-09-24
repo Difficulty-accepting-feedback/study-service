@@ -15,4 +15,6 @@ public interface GroupJpaRepository
 
     @Query("select g.name from GroupJpaEntity g where g.id = :groupId")
     String findGroupNameById(@Param("groupId") Long groupId);
+
+    boolean existsByName(String name);
 }

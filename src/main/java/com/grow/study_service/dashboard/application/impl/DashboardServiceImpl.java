@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Slf4j
 @Service
@@ -69,8 +69,8 @@ public class DashboardServiceImpl implements DashboardService {
         GroupMember groupMember = groupMemberRepository.findById(memberId).orElseThrow(() ->
                 new ServiceException(ErrorCode.GROUP_MEMBER_NOT_FOUND));
 
-        LocalDateTime start = group.getStartAt();  // 시작일
-        LocalDateTime end = group.getEndAt();      // 종료일
+        LocalDate start = group.getStartAt();  // 시작일
+        LocalDate end = group.getEndAt();      // 종료일
 
         long totalDays = group.calculateTotalDays(start, end); // 총 일수 계산 (시작일 포함)
         double rate = groupMember.calculateTotalAttendanceRate(totalDays); // 출석률 계산
@@ -95,8 +95,8 @@ public class DashboardServiceImpl implements DashboardService {
         Group group = groupRepository.findById(groupId).orElseThrow(() ->
                 new ServiceException(ErrorCode.GROUP_NOT_FOUND));
 
-        LocalDateTime start = group.getStartAt();  // 시작일
-        LocalDateTime end = group.getEndAt();      // 종료일
+        LocalDate start = group.getStartAt();  // 시작일
+        LocalDate end = group.getEndAt();      // 종료일
 
         long totalDays = group.calculateTotalDays(start, end); // 총 일수 계산 (시작일 포함)
         long elapsedDays = group.calculateElapsedDays(start);  // 경과 일수 계산 (시작일 포함)

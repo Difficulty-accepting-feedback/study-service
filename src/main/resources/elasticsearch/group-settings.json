@@ -1,0 +1,53 @@
+{
+  "analysis": {
+    "filter": {
+      "product_synonyms": {
+        "type": "synonym",
+        "synonyms": [
+          "자바, java, spring, 스프링, JAVA_PROGRAMMING",
+          "파이썬, python, py, django",
+          "취미, 동호회"
+        ]
+      }
+    },
+    "analyzer": {
+      "groups_name_analyzer": {
+        "char_filter": [],
+        "tokenizer": "nori_tokenizer",
+        "filter": [
+          "nori_part_of_speech",
+          "nori_readingform",
+          "lowercase",
+          "product_synonyms"
+        ]
+      },
+      "groups_description_analyzer": {
+        "char_filter": ["html_strip"],
+        "tokenizer": "nori_tokenizer",
+        "filter": [
+          "nori_part_of_speech",
+          "nori_readingform",
+          "lowercase"
+        ]
+      },
+      "groups_category_analyzer": {
+        "char_filter": [],
+        "tokenizer": "nori_tokenizer",
+        "filter": [
+          "nori_part_of_speech",
+          "nori_readingform",
+          "lowercase"
+        ]
+      },
+      "groups_skillTag_analyzer": {
+        "char_filter": [],
+        "tokenizer": "nori_tokenizer",
+        "filter": [
+          "nori_part_of_speech",
+          "nori_readingform",
+          "lowercase"
+        ]
+      }
+    }
+  }
+}

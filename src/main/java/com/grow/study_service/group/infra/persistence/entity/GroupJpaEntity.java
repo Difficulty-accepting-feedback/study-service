@@ -1,6 +1,6 @@
 package com.grow.study_service.group.infra.persistence.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import com.grow.study_service.group.domain.enums.Category;
 
@@ -39,9 +39,9 @@ public class GroupJpaEntity {
 	@Enumerated(EnumType.STRING)
 	private SkillTag skillTag;
 
-	private LocalDateTime startAt; // 시작 날짜
+	private LocalDate startAt; // 시작 날짜
 
-	private LocalDateTime endAt; // 종료 날짜
+	private LocalDate endAt; // 종료 날짜
 
 	@Version
 	private Long version; // 낙관적 락

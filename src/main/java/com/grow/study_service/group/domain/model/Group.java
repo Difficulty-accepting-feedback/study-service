@@ -7,6 +7,7 @@ import com.grow.study_service.group.domain.enums.SkillTag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -38,12 +39,12 @@ public class Group {
     /**
      * 그룹이 생성된 날짜와 시간. 생성 시점에 설정되며, 변경되지 않습니다.
      */
-    private final LocalDateTime startAt;
+    private final LocalDate startAt;
 
     /**
      * 그룹의 종료 날짜와 시간. 그룹이 종료되기 전까지 유효합니다.
      */
-    private final LocalDateTime endAt;
+    private final LocalDate endAt;
 
     /**
      * 그룹의 이름. 업데이트 가능하며, 비어 있지 않아야 합니다.
@@ -68,14 +69,12 @@ public class Group {
     /**
      * 그룹의 성격/특성 관련 태그.
      */
-    private PersonalityTag personalityTag;
+    private PersonalityTag personalityTag; // 특성 태그 -> Null 가능, List 가능으로 변경 필요함
 
     /**
      * 기술/스킬 관련 태그.
      */
     private SkillTag skillTag;
-
-
 
     private Long version; // 낙관적 락
 
@@ -95,13 +94,13 @@ public class Group {
                                PersonalityTag personalityTag,
                                SkillTag skillTag,
                                int amount,
-                               LocalDateTime endAt) {
+                               LocalDate endAt) {
 
         verifyParameters(name, category, description);
         return new Group(
                 null, // 자동 생성
                 category,
-                LocalDateTime.now(), // 데이터베이스에 저장될 때는 현재 시각을 사용함.
+                LocalDate.now(), // 데이터베이스에 저장될 때는 현재 시각을 사용함.
                 endAt,
                 name,
                 description,
@@ -145,8 +144,8 @@ public class Group {
                            int viewCount,
                            PersonalityTag personalityTag,
                            SkillTag skillTag,
-                           LocalDateTime startAt,
-                           LocalDateTime endAt,
+                           LocalDate startAt,
+                           LocalDate endAt,
                            Long version) {
 
         return new Group(
@@ -199,8 +198,8 @@ public class Group {
     }
 
     // 총 일수 계산: ChronoUnit 으로 일 단위 차이 (시작일 포함 위해 +1)
-    public long calculateTotalDays (LocalDateTime start, LocalDateTime end) {
-        long totalDays = ChronoUnit.DAYS.between(start.toLocalDate(), end.toLocalDate()) + 1;
+    public long calculateTotalDays (LocalDate start, LocalDate end) {
+        long totalDays = ChronoUnit.DAYS.between(start, end) + 1;
 
         if (totalDays <= 0) {
             // 유효성 검사 (end < start 방지)
@@ -211,8 +210,8 @@ public class Group {
     }
 
     // 시작에서 현재까지의 경과 일수
-    public long calculateElapsedDays(LocalDateTime start) {
-        return ChronoUnit.DAYS.between(start.toLocalDate(), LocalDateTime.now().toLocalDate()) + 1;
+    public long calculateElapsedDays(LocalDate start) {
+        return ChronoUnit.DAYS.between(start, LocalDateTime.now().toLocalDate()) + 1;
     }
 
     // 진행률 계산: 남은 일수 / 전체 일수
