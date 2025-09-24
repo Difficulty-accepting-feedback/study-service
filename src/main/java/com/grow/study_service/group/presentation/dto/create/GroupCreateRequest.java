@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -23,7 +23,7 @@ public class GroupCreateRequest {
     /** 그룹의 종료 날짜와 시간. 그룹이 종료되기 전까지 유효합니다. */
     @NotNull(message = "종료 시간은 필수입니다.")
     @Future(message = "종료 시간은 현재 또는 미래여야 합니다.")
-    private final LocalDateTime endAt;
+    private final LocalDate endAt;
 
     /** 그룹의 이름. 업데이트 가능하며, 비어 있지 않아야 합니다. */
     @NotBlank(message = "그룹 이름은 필수이며, 빈 문자열일 수 없습니다.")

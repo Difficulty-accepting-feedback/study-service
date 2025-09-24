@@ -4,7 +4,7 @@
       "product_synonyms": {
         "type": "synonym",
         "synonyms": [
-          "자바, java, spring, 스프링,",
+          "자바, java, spring, 스프링, JAVA_PROGRAMMING",
           "파이썬, python, py, django",
           "취미, 동호회"
         ]

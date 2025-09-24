@@ -4,13 +4,15 @@ import com.grow.study_service.group.domain.enums.Category;
 import com.grow.study_service.group.domain.enums.PersonalityTag;
 import com.grow.study_service.group.domain.enums.SkillTag;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Document(indexName = "groups")
 @Setting(settingPath = "/elasticsearch/group-settings.json")
+@Getter
 @AllArgsConstructor
 public class GroupDocument {
 
@@ -40,10 +42,10 @@ public class GroupDocument {
     private Category category;
 
     @Field(type = FieldType.Date)
-    private LocalDateTime startAt;
+    private LocalDate startAt;
 
     @Field(type = FieldType.Date)
-    private LocalDateTime endAt;
+    private LocalDate endAt;
 
     @Field(type = FieldType.Integer)
     private int amount;
