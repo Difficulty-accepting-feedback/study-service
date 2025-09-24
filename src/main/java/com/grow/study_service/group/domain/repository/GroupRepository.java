@@ -12,4 +12,5 @@ public interface GroupRepository {
 	void delete(Group group);
     List<Group> findAllByCategory(Category category);
 	String findGroupNameById(Long groupId);
+	boolean existsByGroupName(String groupName);
 }
