@@ -68,14 +68,12 @@ public class Group {
     /**
      * 그룹의 성격/특성 관련 태그.
      */
-    private PersonalityTag personalityTag;
+    private PersonalityTag personalityTag; // 특성 태그 -> Null 가능, List 가능으로 변경 필요함
 
     /**
      * 기술/스킬 관련 태그.
      */
     private SkillTag skillTag;
-
-
 
     private Long version; // 낙관적 락
 
