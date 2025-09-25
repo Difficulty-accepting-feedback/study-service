@@ -60,13 +60,13 @@ public class GroupCreateServiceImpl implements GroupCreateService {
                 saved.getGroupId().toString(), // 원본 Long 타입 저장 -> String 타입으로 저장
                 saved.getName(),
                 saved.getDescription(),
-                saved.getCategory(),
+                saved.getCategory().getDescription(),
                 saved.getStartAt(),
                 saved.getEndAt(),
                 saved.getAmount(),
                 saved.getViewCount(),
                 saved.getPersonalityTag(),
-                saved.getSkillTag()
+                saved.getSkillTag().getDescription()
         );
     }
 
