@@ -88,7 +88,9 @@ public enum ErrorCode {
      */
     TODO_NOT_FOUND("404", "해당 TO-DO를 찾을 수 없습니다." ),
     CANNOT_CHANGE_STATUS_OF_COMPLETED_TODO("403", "이미 완료된 TO-DO의 상태를 변경할 수 없습니다." ),
-    CANNOT_DELETE_KANBANBOARD("403", "이 TO-DO를 삭제할 권한이 없습니다."), ;
+    CANNOT_DELETE_KANBANBOARD("403", "이 TO-DO를 삭제할 권한이 없습니다."),
+
+    INVALID_SORT_BY_VALUE("400", "정렬 기준이 올바르지 않습니다. 정렬 기준은 'startAt', 'viewCount' 중 하나입니다." );
 
     private final String code;
     private final String message;

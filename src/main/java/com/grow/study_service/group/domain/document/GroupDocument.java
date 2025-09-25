@@ -39,7 +39,7 @@ public class GroupDocument {
                     @InnerField(suffix = "raw", type = FieldType.Keyword)
             }
     )
-    private Category category;
+    private String category;
 
     @Field(type = FieldType.Date)
     private LocalDate startAt;
@@ -62,7 +62,7 @@ public class GroupDocument {
                     @InnerField(suffix = "raw", type = FieldType.Keyword)
             }
     )
-    private SkillTag skillTag;
+    private String skillTag;
 
     // 하이라이팅 하기 위함
     public void updateName(String newName) {
