@@ -28,4 +28,20 @@ public class GroupCreateController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 여러 건 함께 (테스트 용도)
+    @PostMapping("/create-many")
+    public ResponseEntity<RsData<Long[]>> createGroups(@RequestHeader("X-Authorization-Id") Long memberId,
+                                                     @RequestBody GroupCreateRequest[] requests) {
+        Long[] groupIds = new Long[requests.length];
+        for (int i = 0; i < requests.length; i++) {
+            groupIds[i] = groupCreateService.createGroup(requests[i], memberId);
+        }
+        RsData<Long[]> response = new RsData<>(
+                "201",
+                "그룹 생성 완료",
+                groupIds
+        );
+        return ResponseEntity.ok(response);
+    }
 }
