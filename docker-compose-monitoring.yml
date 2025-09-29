@@ -1,0 +1,26 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    user: "65534:65534"
+    ports:
+      - "9090:9090"  # Prometheus UI 포트
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Prometheus 설정 파일 마운트
+      - prometheus-data:/prometheus  # 데이터 지속성
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    user: "472:472"
+    ports:
+      - "3000:3000"  # Grafana UI 포트
+    volumes:
+      - grafana-data:/var/lib/grafana  # 데이터 지속성
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # 초기 비밀번호 설정
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus-data:
+  grafana-data:

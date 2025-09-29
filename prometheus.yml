@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+rule_files:
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+  - job_name: "spring-actuator"
+    metrics_path: '/actuator/prometheus' # 수집할 경로를 지정
+    scrape_interval: 10s # 수집할 주기를 설정
+    static_configs:
+      - targets: ['host.docker.internal:8085'] # 수집할 서버의 IP, PORT를 지정

@@ -130,6 +130,11 @@ dependencies {
 
 	// mysql
 	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// metric 수집
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+	implementation "io.micrometer:micrometer-core"
 }
 
 tasks.named('test') {

@@ -10,6 +10,7 @@ import com.grow.study_service.group.presentation.dto.create.GroupCreateRequest;
 import com.grow.study_service.groupmember.domain.enums.Role;
 import com.grow.study_service.groupmember.domain.model.GroupMember;
 import com.grow.study_service.groupmember.domain.repository.GroupMemberRepository;
+import io.micrometer.core.annotation.Counted;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +35,7 @@ public class GroupCreateServiceImpl implements GroupCreateService {
      */
     @Override
     @Transactional
+    @Counted("group.create")
     public Long createGroup(GroupCreateRequest request, Long memberId) {
         log.info("[GROUP][CREATE][START] 생성자={} - 그룹 생성 시작", memberId);
 

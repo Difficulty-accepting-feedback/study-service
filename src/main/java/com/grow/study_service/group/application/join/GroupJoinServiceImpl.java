@@ -16,6 +16,7 @@ import com.grow.study_service.group.presentation.dto.join.JoinRequest;
 import com.grow.study_service.groupmember.domain.enums.Role;
 import com.grow.study_service.groupmember.domain.model.GroupMember;
 import com.grow.study_service.groupmember.domain.repository.GroupMemberRepository;
+import io.micrometer.core.annotation.Counted;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -51,6 +52,7 @@ public class GroupJoinServiceImpl implements GroupJoinService {
      */
     @Override
     @Transactional
+    @Counted("join.request")
     public void joinGroup(Long memberId, Long groupId) {
         log.info("[GROUP][JOIN][START] memberId={} groupId={} - 그룹 가입 시작", memberId, groupId);
 
@@ -92,6 +94,7 @@ public class GroupJoinServiceImpl implements GroupJoinService {
      */
     @Override
     @Transactional(readOnly = true)
+    @Counted("join.request")
     public void sendJoinRequest(JoinRequest request, Long memberId) {
         log.info("[GROUP][JOIN][START] memberId={} groupId={} - 그룹 가입 요청 전송 시작", memberId, request.getGroupId());
 
@@ -189,6 +192,7 @@ public class GroupJoinServiceImpl implements GroupJoinService {
      */
     @Override
     @Transactional
+    @Counted("join.request")
     public void acceptJoinRequest(Long memberId, JoinConfirmRequest request) {
         // memberId = 그룹장 아이디, request.getMemberId = 대상 멤버 아이디
         verifyGroupLeaderPermission(memberId, request);
