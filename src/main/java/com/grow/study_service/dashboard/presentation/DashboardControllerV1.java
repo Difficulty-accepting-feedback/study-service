@@ -3,14 +3,17 @@ package com.grow.study_service.dashboard.presentation;
 import com.grow.study_service.common.rsdata.RsData;
 import com.grow.study_service.dashboard.application.DashboardService;
 import com.grow.study_service.kanbanboard.presentation.controller.KanbanBoardController;
+import com.grow.study_service.kanbanboard.presentation.dto.response.KanbanBoardResponse;
 import com.grow.study_service.notice.application.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/study/dashboard")
-public class DashboardController {
+public class DashboardControllerV1 {
 
     private final NoticeService noticeService;
     private final DashboardService dashboardService;
@@ -59,7 +62,7 @@ public class DashboardController {
     // 현재 진행률을 나타내는 퍼센트 API
     @GetMapping("/remaining-percentage/{groupId}")
     public RsData<Double> getProgressPercentage(@RequestHeader("X-Authorization-Id") Long memberId,
-                                                 @PathVariable("groupId") Long groupId) {
+                                                @PathVariable("groupId") Long groupId) {
 
         Double progressPercentage = dashboardService.getProgressPercentage(groupId, memberId);
 
@@ -75,8 +78,8 @@ public class DashboardController {
     /**
      * == 칸반보드 (To-do list) API ==
      * TodoController 에서 구현될 예정입니다.
+     *
      * @see KanbanBoardController
      */
 
-    // 오늘의 퀴즈
 }
