@@ -2,8 +2,9 @@ package com.grow.study_service.dashboard.presentation;
 
 import com.grow.study_service.common.rsdata.RsData;
 import com.grow.study_service.dashboard.application.DashboardService;
+import com.grow.study_service.dashboard.application.QuizService;
+import com.grow.study_service.dashboard.presentation.dto.QuizRankDto;
 import com.grow.study_service.kanbanboard.presentation.controller.KanbanBoardController;
-import com.grow.study_service.kanbanboard.presentation.dto.response.KanbanBoardResponse;
 import com.grow.study_service.notice.application.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ public class DashboardControllerV1 {
 
     private final NoticeService noticeService;
     private final DashboardService dashboardService;
+    private final QuizService quizService;
 
     // 대시보드에 입장 -> 그룹의 출석률을 올려 줄 수 있도록 하는 API
     @PostMapping("/update-rate/{groupId}")
@@ -82,4 +84,16 @@ public class DashboardControllerV1 {
      * @see KanbanBoardController
      */
 
+    // == 오늘의 퀴즈 랭킹 API ==
+    @GetMapping("/quiz-ranking/{groupId}")
+    public RsData<List<QuizRankDto>> getQuizRanking(@RequestHeader("X-Authorization-Id") Long memberId,
+                                                    @PathVariable("groupId") Long groupId) {
+
+        List<QuizRankDto> quizRankDtoList = quizService.getQuizRanking(groupId, memberId); // 오늘의 퀴즈 랭킹 조회
+        return new RsData<>(
+                "200",
+                "오늘의 퀴즈 랭킹 조회 완료",
+                quizRankDtoList
+        );
+    }
 }
