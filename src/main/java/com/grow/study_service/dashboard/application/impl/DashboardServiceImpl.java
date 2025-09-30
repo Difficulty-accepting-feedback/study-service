@@ -10,10 +10,14 @@ import com.grow.study_service.groupmember.domain.model.GroupMember;
 import com.grow.study_service.groupmember.domain.repository.GroupMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 @Slf4j
 @Service
@@ -22,9 +26,11 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final GroupMemberRepository groupMemberRepository;
     private final GroupRepository groupRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     /**
      * 주어진 그룹 ID와 멤버 ID에 해당하는 멤버의 누적 출석 일수를 증가시킵니다.
+     * 1일 1회만 적용됩니다.
      *
      * @param groupId 그룹 ID (검증용)
      * @param memberId 멤버 ID
@@ -38,6 +44,20 @@ public class DashboardServiceImpl implements DashboardService {
 
         log.info("[DASHBOARD][ATTENDANCE][START] 그룹 {}의 멤버 {}의 출석일을 누적 시작, 현재 출석일={}",
                 groupId, memberId, findMember.getTotalAttendanceDays());
+
+        if (redisTemplate.hasKey("attendanceDays:" + memberId)) {
+            // 대시보드에 다시 접속한 것뿐이지 오류 사항은 아니기 때문에 오류를 던지지 않음
+            log.info("[DASHBOARD][ATTENDANCE][END] 이미 출석체크 되었습니다, 그룹 {}의 멤버 {}의 출석일={}",
+                    groupId, memberId, findMember.getTotalAttendanceDays());
+            return;
+        }
+
+        // 출석이 진행되지 않았던 경우 -> redis 에 출석했음을 저장
+        String key = "attendanceDays:" + memberId;
+        redisTemplate.opsForValue().increment(key); // 자동 증가 값
+
+        LocalDateTime expirationTime = LocalDate.now().plusDays(1).atStartOfDay();  // 다음 날 00:00
+        redisTemplate.expireAt(key, Date.from(expirationTime.atZone(ZoneId.systemDefault()).toInstant()));
 
         // 도메인 로직 호출: 출석 일수 누적 업데이트 (반환값으로 업데이트된 도메인 객체 받음)
         // 반환값이 필요는 없으나, 로그에서 편하게 확인하기 위해서 반환값 사용
