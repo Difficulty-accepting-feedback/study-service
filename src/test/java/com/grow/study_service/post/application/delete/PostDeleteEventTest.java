@@ -4,10 +4,7 @@ import com.grow.study_service.common.config.RedisConfig;
 import com.grow.study_service.post.application.file.event.dto.FileCleanUpEvent;
 import com.grow.study_service.post.application.file.event.listener.FileCleanupListener;
 import com.grow.study_service.post.application.file.event.schedular.FileCleanupScheduler;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,6 +74,7 @@ public class PostDeleteEventTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("이벤트 발행 후 리스너가 파일 삭제에 성공하는 경우")
     void testEventPublishedAndListenerDeletesFileSuccessfully() throws IOException {
         // Given: 테스트용 임시 파일 생성

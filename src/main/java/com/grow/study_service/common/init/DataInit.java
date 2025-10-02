@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Component
+// @Component
 @AllArgsConstructor
 public class DataInit implements CommandLineRunner {
 

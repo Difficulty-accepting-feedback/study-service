@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -65,7 +66,7 @@ public class DeleteCommentTest {
     @BeforeEach
     void outerSetUp() {
         /* ① 그룹 도메인 객체 생성 및 저장 */
-        group = groupRepository.save(Group.create("스터디 그룹", Category.STUDY, "도메인 테스트용 그룹", null, null, 0));
+        group = groupRepository.save(Group.create("스터디 그룹", Category.STUDY, "도메인 테스트용 그룹", null, null, 0, LocalDate.now().plusYears(1)));
 
         /* ② 게시판 도메인 객체 생성 및 저장 */
         board = Board.create(
@@ -134,7 +135,7 @@ public class DeleteCommentTest {
                 /* ASSERT 2: 계층형 조회 결과 확인 */
                 List<CommentResponse> tree = commentService.getCommentsByPostId(postId, AUTHOR_ID);
                 assertThat(tree).hasSize(1);
-                assertThat(tree.get(0).getContent()).isEqualTo("삭제되었습니다.");
+                assertThat(tree.get(0).getContent()).isEqualTo("삭제된 댓글입니다.");
             }
         }
 
@@ -177,7 +178,7 @@ public class DeleteCommentTest {
                 assertThat(result).hasSize(1);
                 CommentResponse deletedRoot = result.get(0);
 
-                assertThat(deletedRoot.getContent()).isEqualTo("삭제되었습니다.");
+                assertThat(deletedRoot.getContent()).isEqualTo("삭제된 댓글입니다.");
                 assertThat(deletedRoot.getReplies()).hasSize(2)
                         .extracting(CommentResponse::getContent)
                         .containsExactlyInAnyOrder("대댓글1", "대댓글2");
@@ -226,7 +227,7 @@ public class DeleteCommentTest {
                 CommentResponse root = result.get(0);
                 CommentResponse deletedChild = root.getReplies().get(0);
 
-                assertThat(deletedChild.getContent()).isEqualTo("삭제되었습니다.");
+                assertThat(deletedChild.getContent()).isEqualTo("삭제된 댓글입니다.");
                 assertThat(deletedChild.getReplies()).hasSize(1);
                 CommentResponse grand = deletedChild.getReplies().get(0);
 

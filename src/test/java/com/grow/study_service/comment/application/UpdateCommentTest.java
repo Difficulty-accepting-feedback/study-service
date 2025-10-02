@@ -27,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,7 +72,8 @@ public class UpdateCommentTest {
                         .name("스터디")
                         .category(Category.STUDY)
                         .description("desc")
-                        .createdAt(LocalDateTime.now())
+                        .startAt(LocalDate.now())
+                        .endAt(LocalDate.now().plusYears(1))
                         .build()
         );
         BoardJpaEntity board = boardRepository.save(
