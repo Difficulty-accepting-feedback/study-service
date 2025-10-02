@@ -43,7 +43,9 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: create application.yml
-        run: echo "${{ secrets.APPLICATION_PROPERTIES }}" | base64 --decode > src/main/resources/application.yml
+        run: |
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" | base64 --decode > src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_TEST_PROPERTIES }}" | base64 --decode > src/main/resources/application-test.yml
 
       # Gradle 빌드 실행 + 테스트를 포함
       - name: Build with Gradle
