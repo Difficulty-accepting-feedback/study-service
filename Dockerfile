@@ -1,4 +1,5 @@
-FROM docker.elastic.co/elasticsearch/elasticsearch:8.17.4
+FROM eclipse-temurin:21-jdk
 
-# Nori Analyzer 플러그인 설치 (한글 검색이 유효할 수 있도록)
-RUN bin/elasticsearch-plugin install analysis-nori
+COPY build/libs/study_service-0.0.1-SNAPSHOT.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "/app.jar"]

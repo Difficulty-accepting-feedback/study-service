@@ -2,7 +2,7 @@ services:
   elastic:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-elasticsearch
     ports:
       - 9200:9200 # 9200번 포트에서 Elasticsearch 실행
     environment:
