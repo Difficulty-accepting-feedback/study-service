@@ -88,5 +88,5 @@ jobs:
           # CI/CD 안정성을 위해 pull 추가
           script: |
             docker image prune -a -f 
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/grow-member-server:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:latest
             kubectl apply -f deployment.yaml
