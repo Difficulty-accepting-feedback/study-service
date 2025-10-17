@@ -1,10 +1,7 @@
-name: CICD
+name: CD
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
@@ -89,4 +86,4 @@ jobs:
           script: |
             docker image prune -a -f 
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:latest
-            kubectl rollout restart deployment deployment.yaml
+            kubectl rollout restart deployment grow-study-deployment
