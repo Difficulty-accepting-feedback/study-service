@@ -21,7 +21,7 @@ public class GroupFindController {
     private final GroupTransactionService groupService;
 
     // 전체 그룹 조회 (카테고리 별 조회 가능)
-    @GetMapping()
+    @GetMapping("/anyone")
     public RsData<List<GroupResponse>> getGroups(@RequestParam("category") Category category) {
 
         List<GroupResponse> responses = groupFacadeService.getAllGroupsByCategory(category);
@@ -34,7 +34,7 @@ public class GroupFindController {
     }
 
     // 특정 그룹 조회 (ID)
-    @GetMapping("/{groupId}")
+    @GetMapping("/anyone/{groupId}")
     public RsData<GroupDetailResponse> getSingleGroup(@PathVariable("groupId") Long groupId) {
 
         GroupDetailResponse response = groupFacadeService.getGroupByCategory(groupId);
