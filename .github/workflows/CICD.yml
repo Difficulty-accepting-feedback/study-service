@@ -89,4 +89,4 @@ jobs:
           script: |
             docker image prune -a -f 
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:latest
-            kubectl apply -f deployment.yaml
+            kubectl rollout restart deployment deployment.yaml
