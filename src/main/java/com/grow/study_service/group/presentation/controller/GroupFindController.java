@@ -14,14 +14,14 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/groups")
+@RequestMapping("/api/v1/groups/anyone")
 public class GroupFindController {
 
     private final GroupFacadeService groupFacadeService;
     private final GroupTransactionService groupService;
 
     // 전체 그룹 조회 (카테고리 별 조회 가능)
-    @GetMapping("/anyone")
+    @GetMapping()
     public RsData<List<GroupResponse>> getGroups(@RequestParam("category") Category category) {
 
         List<GroupResponse> responses = groupFacadeService.getAllGroupsByCategory(category);
@@ -34,7 +34,7 @@ public class GroupFindController {
     }
 
     // 특정 그룹 조회 (ID)
-    @GetMapping("/anyone/{groupId}")
+    @GetMapping("/{groupId}")
     public RsData<GroupDetailResponse> getSingleGroup(@PathVariable("groupId") Long groupId) {
 
         GroupDetailResponse response = groupFacadeService.getGroupByCategory(groupId);
