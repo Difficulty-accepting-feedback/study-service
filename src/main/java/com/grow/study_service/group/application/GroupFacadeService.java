@@ -9,9 +9,11 @@ import com.grow.study_service.group.presentation.dto.GroupDetailResponse;
 import com.grow.study_service.group.presentation.dto.GroupResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,7 @@ public class GroupFacadeService {
     private final GroupTransactionService groupTransactionService; // 트랜잭션 처리 담당
     private final MemberApiService memberApiService; // 외부 API 호출 담당
     private final GroupJoinService groupJoinService;
+    private final RedisTemplate<String, String> redisTemplate; // 캐시 관련 (멤버의 닉네임)
 
     public List<GroupResponse> getAllGroupsByCategory(Category category) {
         // 트랜잭션 내에서 그룹 + 리더의 데이터를 가져온 후,
@@ -40,10 +43,22 @@ public class GroupFacadeService {
         // 각 그룹의 리더 정보를 조회하고,
         List<Long> memberIds = groupsWithLeaders.stream()
                 .map(gwl -> gwl.getLeader().getMemberId())
-                .collect(Collectors.toList());
+                .toList();
 
-        // WebClient를 통해 멤버 서비스에 동기 HTTP 요청을 보내 리더의 이름을 가져옴
-        List<String> leaderNames = memberApiService.fetchMemberNames(memberIds);
+        // 리더 닉네임 조회 및 캐싱 로직 (캐시 미스 시 API 호출 후 저장)
+        List<String> leaderNames = memberIds.stream()
+                .map(id -> {
+                    String key = id.toString();
+                    if (!redisTemplate.hasKey(key)) {
+                        // 캐시에 없으면 API 호출하여 가져오고 Redis에 저장
+                        String memberName = memberApiService.getMemberName(id);
+                        redisTemplate.opsForValue().set(key, memberName); // 캐시 저장 (id : 닉네임)
+                        return memberName;
+                    }
+                    // 캐시에서 직접 가져옴
+                    return redisTemplate.opsForValue().get(key);
+                })
+                .toList();
 
         // 그룹 정보와 리더 이름을 결합하여 GroupResponse 객체 생성
         return groupTransactionService.buildGroupResponses(groupsWithLeaders, leaderNames, category);
