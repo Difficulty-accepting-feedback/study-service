@@ -33,7 +33,6 @@ public class GroupFacadeService {
     private final MemberApiService memberApiService; // 외부 API 호출 담당
     private final GroupJoinService groupJoinService;
 
-    @Transactional(readOnly = true)
     public List<GroupResponse> getAllGroupsByCategory(Category category) {
         // 트랜잭션 내에서 그룹 + 리더의 데이터를 가져온 후,
         List<GroupWithLeader> groupsWithLeaders = groupTransactionService.prepareGroupsByCategory(category);
