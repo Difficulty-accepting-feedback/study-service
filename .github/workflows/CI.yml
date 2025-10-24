@@ -75,21 +75,18 @@ jobs:
 
       # GitOps manifests 레포 체크아웃 (별도 레포이므로 PAT 사용)
       - name: Checkout manifests repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: Difficulty-accepting-feedback/k8s-manifests
-          token: ${{ secrets.TOKEN_PAT }}  # PAT로 main 브랜치 푸시 허용
+          token: ${{ secrets.TOKEN_PAT }}
           ref: main
-          path: manifests
+          path: manifests/study
 
-      # Kustomize 공식 스크립트로 설치
-      - name: Setup Kustomize
-        run: |
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash -s -- install v5.3.0 /usr/local/bin
-          kustomize version
-          echo "Kustomize installed at: $(which kustomize)"
-          echo "PATH includes /usr/local/bin: $(echo $PATH | grep /usr/local/bin || echo 'Not found')"
-        shell: bash
+      - name: Install Kustomize
+      - uses: imranismail/setup-kustomize@v2
+        with:
+          kustomize-version: '*'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       # Kustomization에서 이미지 태그 업데이트 (newTag: github.sha)
       - name: Update Kustomization image tag
