@@ -92,7 +92,15 @@ jobs:
       - name: Update Kustomization image tag
         run: |
           cd manifests/study
+          ls -la
+          if [ ! -f kustomization.yaml ]; then
+            echo "Error: kustomization.yaml not found!"
+            exit 1
+          fi
+          cat kustomization.yaml
           kustomize edit set image ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server=${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:${{ github.sha }}
+          cat kustomization.yaml
+        working-directory: ${{ github.workspace }}
 
 #      # Git 변경 커밋 및 푸시 (ArgoCD 트리거)
 #      - name: Commit and push manifests update
