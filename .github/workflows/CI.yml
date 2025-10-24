@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:6
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # 코드 체크아웃
+      - uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Verify Java version
+        run: java -version
+
+      # Gradle Wrapper 실행 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod 777 ./gradlew
+
+      # Gradle 캐시 설정 (빌드 속도 향상)
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: create application.yml
+        run: |
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" | base64 --decode > src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_TEST_PROPERTIES }}" | base64 --decode > src/main/resources/application-test.yml
+
+      # Gradle 빌드 실행
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+
+      # 이미지를 만들고 DockerHub 에 Push
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker
+        run: docker build --platform linux/arm64 -t ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:${{ github.sha }} -t ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:latest .
+      - name: Push Docker
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:latest
+
+      # GitOps manifests 레포 체크아웃 (별도 레포이므로 PAT 사용)
+      - name: Checkout manifests repo
+        uses: actions/checkout@v3
+        with:
+          repository: Difficulty-accepting-feedback/k8s-manifests
+          token: ${{ secrets.GITHUB_PAT }}  # PAT로 main 브랜치 푸시 허용
+          ref: main
+          path: manifests
+
+      # Kustomize 설치 (이미지 업데이트를 위해)
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v2
+        with:
+          kustomize-version: v5.0.4  # 최신 Kustomize 버전 사용
+
+      # Kustomization에서 이미지 태그 업데이트 (newTag: github.sha)
+      - name: Update Kustomization image tag
+        run: |
+          cd manifests/study
+          kustomize edit set image ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server=${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:${{ github.sha }}
+
+      # Git 변경 커밋 및 푸시 (ArgoCD 트리거)
+      - name: Commit and push manifests update
+        run: |
+          cd manifests
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git diff --staged --quiet || git commit -m "📝 update: image tag 변경 - ${{ github.sha }} for grow-study-server"
+          git push origin main
+
+#  deploy:
+#    needs: build
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Deploy to Kubernetes on EC2
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          username: ubuntu
+#          host: ${{ secrets.GROW_STUDY_SERVER_PUBLIC }}
+#          key: ${{ secrets.EC2_SSH_KEY }}
+#          script_stop: true
+#          # CI/CD 안정성을 위해 pull 추가
+#          script: |
+#            docker image prune -a -f
+#            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:latest
+#            kubectl rollout restart deployment grow-study-deployment
