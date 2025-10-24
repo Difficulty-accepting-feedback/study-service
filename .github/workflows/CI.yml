@@ -85,13 +85,8 @@ jobs:
       # Kustomize 공식 스크립트로 설치
       - name: Setup Kustomize
         run: |
-          # 공식 설치 스크립트 다운로드 (Kubernetes SIGs repo)
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash -s -- install v5.3.0 /usr/local/bin/linux_amd64
-
-          # 설치 확인 (버전 출력으로 성공 검증)
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash -s -- install v5.3.0 /usr/local/bin
           kustomize version
-
-          # PATH 확인 (디버깅용)
           echo "Kustomize installed at: $(which kustomize)"
           echo "PATH includes /usr/local/bin: $(echo $PATH | grep /usr/local/bin || echo 'Not found')"
         shell: bash
