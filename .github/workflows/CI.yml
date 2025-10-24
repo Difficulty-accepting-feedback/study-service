@@ -104,6 +104,7 @@ jobs:
       # Git 변경 커밋 및 푸시 (ArgoCD 트리거)
       - name: Commit and push manifests update
         run: |
+          cd manifests/study
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add kustomization.yaml
