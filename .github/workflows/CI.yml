@@ -88,21 +88,21 @@ jobs:
           kustomize-version: 5.7.0
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Kustomization에서 이미지 태그 업데이트 (newTag: github.sha)
-      - name: Update Kustomization image tag
-        run: |
-          cd manifests/study
-          kustomize edit set image ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server=${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:${{ github.sha }}
-
-      # Git 변경 커밋 및 푸시 (ArgoCD 트리거)
-      - name: Commit and push manifests update
-        run: |
-          cd manifests
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add .
-          git diff --staged --quiet || git commit -m "📝 update: image tag 변경 - ${{ github.sha }} for grow-study-server"
-          git push origin main
+#      # Kustomization에서 이미지 태그 업데이트 (newTag: github.sha)
+#      - name: Update Kustomization image tag
+#        run: |
+#          cd manifests/study
+#          kustomize edit set image ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server=${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:${{ github.sha }}
+#
+#      # Git 변경 커밋 및 푸시 (ArgoCD 트리거)
+#      - name: Commit and push manifests update
+#        run: |
+#          cd manifests
+#          git config --local user.email "action@github.com"
+#          git config --local user.name "GitHub Action"
+#          git add .
+#          git diff --staged --quiet || git commit -m "📝 update: image tag 변경 - ${{ github.sha }} for grow-study-server"
+#          git push origin main
 
 #  deploy:
 #    needs: build
