@@ -12,13 +12,16 @@
 
     <!-- 콘솔 색상 로그 패턴 -->
     <property name="LOG_PATTERN"
-              value="%cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %highlight(%-5level) [%yellow(%thread)] [%magenta(%X{traceId:-}),%blue(%X{spanId:-})] %green(%logger{36}) - %msg%n"/>
+              value="%cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %highlight(%-5level) [%yellow(%thread)] [%magenta(%X{traceId:-})] %green(%logger{36}) - %msg%n"/>
 
     <!-- 콘솔 출력 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
             <charset>UTF-8</charset>
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %X{traceId} %X{clientIp} %X{requestUri} %n</pattern>
+            </encoder>
         </encoder>
     </appender>
 
@@ -32,8 +35,39 @@
         </rollingPolicy>
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %X{traceId} %n</pattern>
+            </encoder>
             <charset>UTF-8</charset>
         </encoder>
+    </appender>
+
+    <!-- LogstashTcpSocketAppender 추가: ELK EC2로 JSON 로그 전송 -->
+    <appender name="LOGSTASH_TCP" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>monitoring-elk.groow.store:5001</destination>
+        <connectionTimeout>5000</connectionTimeout>
+        <keepAliveDuration>20 seconds</keepAliveDuration>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <!-- JSON 필드: 타임스탬프, 레벨 등 기본 + MDC + 커스텀 message 패턴 -->
+            <providers>
+                <timestamp/>
+                <logLevel/>
+                <!-- message를 패턴으로 포맷팅: Spring Boot 가독성 형식 적용 -->
+                <message>
+                    <encoder class="net.logstash.logback.encoder.PatternLayoutJsonProvider">
+                        <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg %n</pattern>
+                        <charset>UTF-8</charset>
+                    </encoder>
+                </message>
+                <loggerName/>
+                <threadName/>
+                <mdc/>  <!-- MDC(예: traceId, requestUri)를 JSON 필드로 포함: {"traceId": "abc123", "requestUri": "/api/users"} -->
+                <contextName/>
+                <version/>
+            </providers>
+        </encoder>
+        <!-- 재연결 설정 -->
+        <includeCallerData>true</includeCallerData>
     </appender>
 
     <!-- Hibernate 바인딩 파라미터 로그 전용 파일 -->
@@ -61,6 +95,7 @@
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="APP_FILE"/>
+        <appender-ref ref="LOGSTASH_TCP"/>
     </root>
 
 </configuration>
