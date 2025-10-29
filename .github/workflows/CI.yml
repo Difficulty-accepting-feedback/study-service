@@ -117,20 +117,3 @@ jobs:
         working-directory: ${{ github.workspace }}
         env:
           TOKEN_PAT: ${{ secrets.TOKEN_PAT }}  # push를 위한 PAT
-
-#  deploy:
-#    needs: build
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Deploy to Kubernetes on EC2
-#        uses: appleboy/ssh-action@v1.0.3
-#        with:
-#          username: ubuntu
-#          host: ${{ secrets.GROW_STUDY_SERVER_PUBLIC }}
-#          key: ${{ secrets.EC2_SSH_KEY }}
-#          script_stop: true
-#          # CI/CD 안정성을 위해 pull 추가
-#          script: |
-#            docker image prune -a -f
-#            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/grow-study-server:latest
-#            kubectl rollout restart deployment grow-study-deployment
