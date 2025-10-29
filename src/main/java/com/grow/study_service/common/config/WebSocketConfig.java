@@ -2,8 +2,6 @@ package com.grow.study_service.common.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 /**
  * <h2>WebSocket 구성 클래스.</h2>
@@ -15,31 +13,31 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  * @version 1.0
  * @since 2025-08-07
  */
-@Configuration
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
-    /**
-     * 메시지 브로커를 구성하는 메서드.
-     * 클라이언트가 구독할 토픽 경로와 서버로 메시지를 보낼 접두사를 설정합니다.
-     *
-     * @param config 메시지 브로커 레지스트리 인스턴스.
-     */
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic"); // 클라이언트가 구독할 경로.
-        config.setApplicationDestinationPrefixes("/app"); // 클라이언트가 보낸 메시지를 처리하는 대상 경로.
-    }
-
-    /**
-     * STOMP 엔드포인트를 등록하는 메서드.
-     * 클라이언트가 WebSocket 연결을 시작할 수 있는 URL을 정의하며, 허용된 오리진을 설정합니다.
-     *
-     * @param registry STOMP 엔드포인트 레지스트리 인스턴스.
-     */
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry
-                .addEndpoint("/signaling") // 웹소켓 연결 엔드포인트 URL
-                .setAllowedOriginPatterns("*"); // 모든 도메인 허용
-    }
-}
+//@Configuration
+//public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+//
+//    /**
+//     * 메시지 브로커를 구성하는 메서드.
+//     * 클라이언트가 구독할 토픽 경로와 서버로 메시지를 보낼 접두사를 설정합니다.
+//     *
+//     * @param config 메시지 브로커 레지스트리 인스턴스.
+//     */
+//    @Override
+//    public void configureMessageBroker(MessageBrokerRegistry config) {
+//        config.enableSimpleBroker("/topic"); // 클라이언트가 구독할 경로.
+//        config.setApplicationDestinationPrefixes("/app"); // 클라이언트가 보낸 메시지를 처리하는 대상 경로.
+//    }
+//
+//    /**
+//     * STOMP 엔드포인트를 등록하는 메서드.
+//     * 클라이언트가 WebSocket 연결을 시작할 수 있는 URL을 정의하며, 허용된 오리진을 설정합니다.
+//     *
+//     * @param registry STOMP 엔드포인트 레지스트리 인스턴스.
+//     */
+//    @Override
+//    public void registerStompEndpoints(StompEndpointRegistry registry) {
+//        registry
+//                .addEndpoint("/signaling") // 웹소켓 연결 엔드포인트 URL
+//                .setAllowedOriginPatterns("*"); // 모든 도메인 허용
+//    }
+//}

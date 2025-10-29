@@ -7,7 +7,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 @Slf4j
-@Controller
+// @Controller
 public class TestStompController {
 
     // 간단한 STOMP 메시지 수신 테스트: 클라이언트가 "/app/test"로 메시지 보내면 로그 찍고 브로드캐스트
