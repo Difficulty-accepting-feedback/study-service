@@ -95,7 +95,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	// 웹소켓 + STOMP
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	// implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
 	// swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
@@ -135,6 +135,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation "io.micrometer:micrometer-core"
+
+	// logstash
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'  // LogstashTcpSocketAppender 및 JSON 인코더 추가
+
+	runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64'
 }
 
 tasks.named('test') {
